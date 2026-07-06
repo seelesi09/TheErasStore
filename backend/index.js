@@ -34,7 +34,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Batasan ukuran file maks 5MB
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|webp|gif/;
         const mimetype = filetypes.test(file.mimetype);
@@ -172,7 +172,7 @@ app.get('/api/produk', (req, res) => {
 app.post('/api/produk', upload.array('image', 10), (req, res) => {
     const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar } = req.body;
 
-    if (!Kodeproduk || !Namaproduk || !Kategori || !Harga || !Stok) {
+    if (!Kodeproduk || !Namaproduk || !Kategori || !Harga || !Stok || !Deskripsi) {
         return res.status(400).json({ error: 'Semua field (kecuali gambar) harus diisi' });
     }
 
@@ -216,7 +216,7 @@ app.delete('/api/produk/:id', (req, res) => {
 // Endpoint Update Produk
 app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
     const { id } = req.params;
-    const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar } = req.body;
+    const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar, Deskripsi } = req.body;
 
     const checkQuery = "SELECT Gambar FROM Produk WHERE ID = ?";
 
@@ -239,9 +239,9 @@ app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
             pathGambar = Gambar;
         }
 
-        const updateQuery = 'UPDATE Produk SET Kodeproduk = ?, Namaproduk = ?, Kategori = ?, Harga = ?, Stok = ?, Gambar = ? WHERE ID = ?';
+        const updateQuery = 'UPDATE Produk SET Kodeproduk = ?, Namaproduk = ?, Kategori = ?, Harga = ?, Stok = ?, Gambar = ?, Deskripsi = ? WHERE ID = ?';
 
-        db.query(updateQuery, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, pathGambar, id], (updateErr, result) => {
+        db.query(updateQuery, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, pathGambar, Deskripsi, id], (updateErr, result) => {
             if (updateErr) {
                 console.error('Error updating product:', updateErr.message);
                 return res.status(500).json({ error: updateErr.message });

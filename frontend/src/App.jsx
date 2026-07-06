@@ -5,7 +5,10 @@ import Swal from 'sweetalert2';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Buttons from './components/Button';
+import Edit from './components/Edit';
 import Footer from './components/Footer';
+import Detail from './components/Detail';
+import DecryptedText from './components/Decrypt';
 import BgFolklore from './assets/picture/dashboard-folklore (1).jpg';
 
 // Custom toast wrapper using SweetAlert2
@@ -40,6 +43,15 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   })
 
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('shopey_cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('shopey_cart', JSON.stringify(cart));
+  }, [cart]);
+
   const [authView, setAuthView] = useState(null);
 
   // const [isRegister, setIsRegister] = useState(false);
@@ -48,15 +60,18 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [formAuth, setFormAuth] = useState({ username: '', password: '' });
-
+  const [isDetailOpen, setisDetailOpen] = useState(false);
+  const [selectedProductToDetail, setSelectedProductToDetail] = useState(null);
   const [editId, setEditId] = useState(null);
-
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedProductToEdit, setSelectedProductToEdit] = useState(null);
   const [formProduct, setFormProduct] = useState({
     Kodeproduk: '',
     Namaproduk: '',
     Kategori: '',
     Harga: '',
-    Stok: ''
+    Stok: '',
+    Deskripsi: ''
   });
   const [selectedFiles, setSelectedFiles] = useState([]);
 
@@ -109,27 +124,35 @@ function App() {
   };
 
   // 3. LOGIKA SAVE 
-  const handleSaveProduct = (e) => {
-    e.preventDefault();
+  const handleSaveProduct = (e, dataEdit = null) => {
+    let dataSource = formProduct;
+
+    if (e && (e.Kodeproduk || e.kodeproduk || e.Namaproduk || e.namaproduk)) {
+      dataSource = e;
+      dataSource = dataEdit;
+    } else if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+
     const formData = new FormData();
-    formData.append('Kodeproduk', formProduct.Kodeproduk);
-    formData.append('Namaproduk', formProduct.Namaproduk);
-    formData.append('Kategori', formProduct.Kategori);
-    formData.append('Harga', formProduct.Harga);
-    formData.append('Stok', formProduct.Stok);
+
+    formData.append('Kodeproduk', dataSource.Kodeproduk || dataSource.kodeproduk || '');
+    formData.append('Namaproduk', dataSource.Namaproduk || dataSource.namaproduk || '');
+    formData.append('Kategori', dataSource.Kategori || dataSource.kategori || '');
+    formData.append('Harga', dataSource.Harga || dataSource.harga || 0);
+    formData.append('Stok', dataSource.Stok || dataSource.stok || 0);
+    formData.append('Deskripsi', dataSource.Deskripsi || dataSource.deskripsi || '');
 
     if (selectedFiles && selectedFiles.length > 0) {
       selectedFiles.forEach((file) => {
         formData.append('image', file);
       });
     } else {
-      formData.append('Gambar', formProduct.Gambar || '');
+      formData.append('Gambar', dataSource.Gambar || dataSource.gambar || '');
     }
 
     const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     };
 
     if (editId) {
@@ -137,6 +160,7 @@ function App() {
         .then(() => {
           toast.success('Produk berhasil diupdate!');
           resetFormProduct();
+          setIsEditOpen(false);
           setSelectedFiles([]);
           fetchProducts();
         })
@@ -153,21 +177,25 @@ function App() {
     }
   };
 
-  // 4. MEMICU MODE EDIT (Mengisi data produk ke dalam form)
   const handleEditClick = (product) => {
     setEditId(product.ID); // Kunci ID produk yang mau diedit
+
+    setIsEditOpen(true)
+    setSelectedProductToEdit(product)
+
     setFormProduct({
       Kodeproduk: product.Kodeproduk,
       Namaproduk: product.Namaproduk,
       Kategori: product.Kategori,
       Harga: product.Harga,
-      Stok: product.Stok
+      Stok: product.Stok,
+      Deskripsi: product.Deskripsi
     });
   };
 
   const resetFormProduct = () => {
     setEditId(null);
-    setFormProduct({ Kodeproduk: '', Namaproduk: '', Kategori: '', Harga: '', Stok: '' });
+    setFormProduct({ Kodeproduk: '', Namaproduk: '', Kategori: '', Harga: '', Stok: '', Deskripsi: '' });
     setSelectedFiles([]);
   };
 
@@ -264,7 +292,10 @@ function App() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none" />
             <div className="relative w-full max-w-[1600px] mx-auto z-10 text-left pl-8 md:pl-16 lg:pl-24 space-y-6">
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-folklore text-white/80 leading-tight">
-                Find your best <br />
+                <DecryptedText
+                text='Find Your Best'
+                idleDelay={1000}
+                /> <br />
                 <span className="text-white block mt-2 drop-shadow-lg">Era's</span>
               </h1>
               <p className="text-sm md:text-base max-w-xl text-slate-200 leading-relaxed font-folklore bg-gray">
@@ -292,7 +323,10 @@ function App() {
                   const tiltClass = isEven ? '-rotate-3' : 'rotate-3';
 
                   return (
-                    <div key={product.ID} className="flex flex-col">
+                    <div key={product.ID} className="flex flex-col" onClick={() => {
+                      setSelectedProductToDetail(product);
+                      setisDetailOpen(true)
+                    }}>
                       {/* Card dengan foto dan button */}
                       <div
                         className={`group relative bg-white rounded-sm p-3 pb-8 flex flex-col transition-all duration-300 ${tiltClass} hover:rotate-0 hover:shadow-2xl cursor-pointer border border-slate-300 shadow-md`}
@@ -310,7 +344,8 @@ function App() {
 
                         {/* Button */}
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handleAddToCollection(product.ID);
                           }}
                           className="w-full bg-[#545454] hover:bg-[#838383] text-white font-folklore font-semibold py-3 rounded-sm transition-all"
@@ -481,7 +516,30 @@ function App() {
           </div>
         </section>
       )}
-      <Footer/>
+      <Footer />
+
+      <Edit
+        isOpen={isEditOpen}
+        onClose={() => {
+          setIsEditOpen(false);
+          resetFormProduct();
+        }}
+        productData={selectedProductToEdit}
+        onSave={handleSaveProduct}
+      />
+
+      <Detail
+        isOpen={isDetailOpen}
+        onClose={() => {
+          setisDetailOpen(false);
+          setSelectedProductToDetail(null);
+        }}
+        productData={selectedProductToDetail}
+        onBuyNow={(products) => {
+          setisDetailOpen(false);
+          toast.success(`Buyed ${products.Namaproduk}, Go ahead to payment`)
+        }}
+      />
     </div>
   );
 }
@@ -510,7 +568,6 @@ function ProductImageSlider({ gambarString, namaProduk }) {
 
   return (
     <div className='relative no-scrollbar w-full h-full group overflow-hidden bg-[#abaaaa] rounded-sm'>
-      {/* Foto Produk */}
       <img
         src={images[currentIndex]}
         alt={`${namaProduk} - ${currentIndex + 1}`}
@@ -519,7 +576,6 @@ function ProductImageSlider({ gambarString, namaProduk }) {
 
       {images.length > 1 && (
         <>
-          {/* Tombol Kiri */}
           <button
             onClick={prevSlide}
             className='absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 border border-white/10'
@@ -530,7 +586,6 @@ function ProductImageSlider({ gambarString, namaProduk }) {
             </svg>
           </button>
 
-          {/* Tombol Kanan */}
           <button
             onClick={nextSlide}
             className='absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-black/40 hover:bg-black/70 backdrop-blur-sm text-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 z-10 border border-white/10'
