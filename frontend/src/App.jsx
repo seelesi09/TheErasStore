@@ -9,6 +9,8 @@ import Edit from './components/Edit';
 import Footer from './components/Footer';
 import Detail from './components/Detail';
 import DecryptedText from './components/Decrypt';
+import Cart from './components/Cart';
+import OrderHistory from './components/Orderhistory';
 import BgFolklore from './assets/picture/dashboard-folklore (1).jpg';
 
 // Custom toast wrapper using SweetAlert2
@@ -253,6 +255,25 @@ function App() {
     }
   };
 
+  const handleRealAddToCart = async (productID) => {
+    if (!user) {
+      toast.error('You Must`ve Login First.');
+      setAuthView('login');
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:5000/api/keranjang', {
+        User_ID: user.ID,
+        Produk_ID: productID
+      });
+
+      toast.success(response.data.message || "The Product Succesfully Added to Your Cart");
+    } catch (error) {
+      console.error('Error Add to Cart:', error)
+      toast.error(error.response?.data?.error || "Unable to Add Product")
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans antialiased text-slate-800">
 
@@ -268,14 +289,14 @@ function App() {
         <Login
           onLoginSuccess={handleLoginSuccess}
           onSwitchToSignup={() => setAuthView('signup')}
-          onClose={() => setAuthView(null)} // Tombol close modal
+          onClose={() => setAuthView(null)}
         />
       )}
 
       {authView === 'signup' && (
         <Signup
           onSwitchToLogin={() => setAuthView('login')}
-          onClose={() => setAuthView(null)} // Tombol close modal
+          onClose={() => setAuthView(null)}
         />
       )}
 
@@ -293,13 +314,13 @@ function App() {
             <div className="relative w-full max-w-[1600px] mx-auto z-10 text-left pl-8 md:pl-16 lg:pl-24 space-y-6">
               <h1 className="text-4xl md:text-5xl lg:text-7xl font-folklore text-white/80 leading-tight">
                 <DecryptedText
-                text='Find Your Best'
-                idleDelay={1000}
+                  text='Find Your Best'
+                  idleDelay={1000}
                 /> <br />
                 <span className="text-white block mt-2 drop-shadow-lg">Era's</span>
               </h1>
               <p className="text-sm md:text-base max-w-xl text-slate-200 leading-relaxed font-folklore bg-gray">
-                Hi <strong className="text-white">{user?.username || "User"}</strong>!
+                Hi <strong className="text-white">{user?.Username || "User"}</strong>!
                 Welcome to The Eras Store, we hope you can find your Era's!
               </p>
             </div>
@@ -346,11 +367,11 @@ function App() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAddToCollection(product.ID);
+                            handleRealAddToCart(product.ID);
                           }}
                           className="w-full bg-[#545454] hover:bg-[#838383] text-white font-folklore font-semibold py-3 rounded-sm transition-all"
                         >
-                          ADD TO COLLECTION
+                          Add To Cart
                         </button>
                       </div>
 
@@ -378,6 +399,20 @@ function App() {
             )}
           </section>
         </>
+      )}
+
+      {currentView === 'cart' && (
+        <Cart
+          user={user}
+          setCurrentView={setCurrentView}
+        />
+      )}
+
+      {currentView === 'history' && (
+        <OrderHistory
+          user={user}
+          setCurrentView={setCurrentView}
+        />
       )}
 
       {/* VIEW: DASHBOARD ADMIN */}
@@ -536,8 +571,7 @@ function App() {
         }}
         productData={selectedProductToDetail}
         onBuyNow={(products) => {
-          setisDetailOpen(false);
-          toast.success(`Buyed ${products.Namaproduk}, Go ahead to payment`)
+          handleRealAddToCart(products.ID);
         }}
       />
     </div>

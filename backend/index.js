@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { error } from 'console';
 
 const app = express();
 app.use(cors());
@@ -285,6 +286,171 @@ app.post('/api/produk/decrease-stock', async (req, res) => {
         });
     }
 });
+
+// Tambah ke keranjang
+// Tambah ke keranjang
+app.post('/api/keranjang', (req, res) => {
+    const { User_ID, Produk_ID } = req.body;
+
+    const quertCheck = "Select * from keranjang where User_ID = ? and Produk_ID = ?";
+
+    db.query(quertCheck, [User_ID, Produk_ID], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        if (result.length > 0) {
+            const queryUpdate = 'update keranjang set Jumlah = Jumlah + 1 where User_ID = ? and Produk_ID = ?';
+            db.query(queryUpdate, [User_ID, Produk_ID], (err, updateResult) => {
+                if (err) return res.status(500).json({ error: err.message });
+                return res.json({ message: "Jumlah Produk Di Keranjang Berhasil Ditambah" });
+            });
+        } else {
+            const queryInsert = 'Insert into keranjang (User_ID, Produk_ID, Jumlah) values (?, ?, 1)';
+            db.query(queryInsert, [User_ID, Produk_ID], (err, insertResult) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                return res.status(201).json({ message: 'Produk berhasil dimasukkan ke keranjang' });
+            });
+        }
+    });
+});
+
+app.get('/api/keranjang/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    const query = `
+    select k.ID as Keranjang_ID, k.Jumlah, p.Namaproduk, p.Harga, p.Gambar, p.Stok
+    from keranjang k
+    join produk p on k.Produk_ID = p.ID
+    where k.User_ID = ?
+    `
+    db.query(query, [userId], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    })
+})
+
+// delete keranjang 
+app.delete('/api/keranjang/:id', (req, res) => {
+    const keranjangId = req.params.id;
+    const query = 'Delete from keranjang where id = ?';
+
+    db.query(query, [keranjangId], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Produk berhasil dihapus dari keranjang' });
+    });
+});
+
+// Update Keranjang 
+app.put('/api/keranjang/:id', (req, res) => {
+    const { id } = req.params;
+    const { Jumlah } = req.body;
+
+    if (!Jumlah || Jumlah < 1) {
+        return res.status(400).json({ message: 'Jumlah Minimal Adalah 1' });
+    }
+
+    const query = 'update keranjang set Jumlah = ? where ID = ?';
+    db.query(query, [Jumlah, id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        return res.json({ message: "Jumlah Berhasil Diperbarui" })
+    });
+});
+
+// checkout 
+app.post('/api/checkout', (req, res) => {
+    const { User_ID, Total_Harga } = req.body;
+
+    if (!User_ID || !Total_Harga) {
+        return res.status(400).json({ message: "data tidak lengkap" });
+    }
+
+    const queryGetCart = `
+    select k.Produk_ID, k.Jumlah, p.Harga
+    from keranjang k 
+    join produk p on k.Produk_ID = p.ID
+    where k.User_ID = ?
+    `;
+
+    db.query(queryGetCart, [User_ID], (err, cartItems) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (cartItems.length === 0) return res.status(400).json({ message: "Keranjang Kosong!" });
+
+        const queryInsertOrder = "insert into orders (User_ID, Total_Harga) values (?, ?)";
+        db.query(queryInsertOrder, [User_ID, Total_Harga], (err, orderResult) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            const newOrderId = orderResult.insertId;
+
+            const orderItemsData = cartItems.map(item => [
+                newOrderId,
+                item.Produk_ID,
+                item.Jumlah,
+                item.Harga
+            ]);
+
+            const queryInsertItems = 'insert into order_items (Order_ID, Produk_ID, Jumlah, Harga_Beli) values ?';
+            db.query(queryInsertItems, [orderItemsData], (err) => {
+                if (err) return res.status(500).json({ error: err.message });
+
+                const queryEmptyCart = "delete from keranjang where User_ID = ?";
+                db.query(queryEmptyCart, [User_ID], (err) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    return res.json({ message: "Checkout Berhasil", Order_ID: newOrderId });
+                })
+            });
+        });
+    });
+});
+
+// History Order 
+app.get('/api/orders/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const query = `
+        SELECT 
+            o.ID AS Order_ID, o.Total_Harga, o.Tanggal_Order, o.Status,
+            oi.Jumlah, oi.Harga_Beli,
+            p.Namaproduk, p.Gambar
+        FROM orders o
+        JOIN order_items oi ON o.ID = oi.Order_ID
+        JOIN produk p ON oi.Produk_ID = p.ID
+        WHERE o.User_ID = ?
+        ORDER BY o.Tanggal_Order DESC
+    `;
+
+    db.query(query, [userId], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const formattedOrders = results.reduce((acc, current) => {
+            const foundOrder = acc.find(item => item.Order_ID === current.Order_ID);
+            const itemDetails = {
+                Namaproduk: current.Namaproduk,
+                Gambar: current.Gambar,
+                Jumlah: current.Jumlah,
+                Harga_Beli: current.Harga_Beli
+            };
+
+            if (foundOrder) {
+                foundOrder.Items.push(itemDetails);
+            } else {
+                acc.push({
+                    Order_ID: current.Order_ID,
+                    Total_Harga: current.Total_Harga,
+                    Tanggal_Order: current.Tanggal_Order,
+                    Status: current.Status,
+                    Items: [itemDetails]
+                });
+            }
+            return acc;
+        }, []);
+
+        return res.json(formattedOrders);
+    });
+});
+
 
 const PORT = 5000;
 app.listen(PORT, () => {

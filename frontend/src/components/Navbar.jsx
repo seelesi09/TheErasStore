@@ -21,6 +21,18 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                     Shop
                 </button>
 
+                <button
+                    onClick={() => setCurrentView('cart')}
+                    className={`hover:text-white transition-colors cursor-pointer ${currentView === 'cart' ? 'text-white font-bold' : ''}`}>
+                    Cart
+                </button>
+
+                <button
+                    onClick={() => setCurrentView('history')}
+                    className={`hover:text-white transition-colors cursor-pointer ${currentView === 'history' ? 'text-white font-bold' : ''}`}>
+                    History
+                </button>
+
                 {isAdmin && (
                     <button
                         onClick={() => setCurrentView('admin')}
