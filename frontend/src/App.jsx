@@ -11,6 +11,8 @@ import Detail from './components/Detail';
 import DecryptedText from './components/Decrypt';
 import Cart from './components/Cart';
 import OrderHistory from './components/Orderhistory';
+import AboutUs from './components/AboutUs';
+import Archive from './components/Archive';
 import BgFolklore from './assets/picture/dashboard-folklore (1).jpg';
 
 // Custom toast wrapper using SweetAlert2
@@ -18,7 +20,6 @@ const toast = {
   success: (message) => {
     Swal.fire({
       toast: true,
-      // position: 'top-end',
       showConfirmButton: false,
       timer: 1000,
       timerProgressBar: true,
@@ -29,7 +30,6 @@ const toast = {
   error: (message) => {
     Swal.fire({
       toast: true,
-      // position: 'top-end',
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
@@ -56,7 +56,6 @@ function App() {
 
   const [authView, setAuthView] = useState(null);
 
-  // const [isRegister, setIsRegister] = useState(false);
   const [currentView, setCurrentView] = useState('pembeli');
 
   const [products, setProducts] = useState([]);
@@ -67,6 +66,8 @@ function App() {
   const [editId, setEditId] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedProductToEdit, setSelectedProductToEdit] = useState(null);
+  const inputFileRef = React.useRef(null);
+
   const [formProduct, setFormProduct] = useState({
     Kodeproduk: '',
     Namaproduk: '',
@@ -77,7 +78,6 @@ function App() {
   });
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  // 1. GET ALL PRODUK
   const fetchProducts = async () => {
     setLoading(true);
     axios.get('http://localhost:5000/api/produk')
@@ -125,62 +125,70 @@ function App() {
     toast.success('Berhasil Logout!');
   };
 
-  // 3. LOGIKA SAVE 
-  const handleSaveProduct = (e, dataEdit = null) => {
-    let dataSource = formProduct;
-
-    if (e && (e.Kodeproduk || e.kodeproduk || e.Namaproduk || e.namaproduk)) {
-      dataSource = e;
-      dataSource = dataEdit;
-    } else if (e && typeof e.preventDefault === 'function') {
+  const handleSaveProduct = (e, payload = null) => {
+    if (e && typeof e.preventDefault === 'function') {
       e.preventDefault();
     }
 
     const formData = new FormData();
 
-    formData.append('Kodeproduk', dataSource.Kodeproduk || dataSource.kodeproduk || '');
-    formData.append('Namaproduk', dataSource.Namaproduk || dataSource.namaproduk || '');
-    formData.append('Kategori', dataSource.Kategori || dataSource.kategori || '');
-    formData.append('Harga', dataSource.Harga || dataSource.harga || 0);
-    formData.append('Stok', dataSource.Stok || dataSource.stok || 0);
-    formData.append('Deskripsi', dataSource.Deskripsi || dataSource.deskripsi || '');
-
-    if (selectedFiles && selectedFiles.length > 0) {
-      selectedFiles.forEach((file) => {
-        formData.append('image', file);
-      });
-    } else {
-      formData.append('Gambar', dataSource.Gambar || dataSource.gambar || '');
-    }
-
-    const config = {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    };
-
     if (editId) {
+      formData.append('Kodeproduk', payload.Kodeproduk || '');
+      formData.append('Namaproduk', payload.Namaproduk || '');
+      formData.append('Kategori', payload.Kategori || '');
+      formData.append('Harga', payload.Harga || 0);
+      formData.append('Stok', payload.Stok || 0);
+      formData.append('Deskripsi', payload.Deskripsi || '');
+
+      if (payload.fileBaru && payload.fileBaru.length > 0) {
+        payload.fileBaru.forEach((file) => {
+          formData.append('image', file);
+        });
+      } else {
+        formData.append('Gambar', payload.Gambar || '');
+      }
+
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
       axios.put(`http://localhost:5000/api/produk/${editId}`, formData, config)
         .then(() => {
           toast.success('Produk berhasil diupdate!');
           resetFormProduct();
           setIsEditOpen(false);
-          setSelectedFiles([]);
           fetchProducts();
         })
         .catch((err) => toast.error('Gagal update produk: ' + (err.response?.data?.error || err.message)));
+
     } else {
+      formData.append('Kodeproduk', formProduct.Kodeproduk || '');
+      formData.append('Namaproduk', formProduct.Namaproduk || '');
+      formData.append('Kategori', formProduct.Kategori || '');
+      formData.append('Harga', formProduct.Harga || 0);
+      formData.append('Stok', formProduct.Stok || 0);
+      formData.append('Deskripsi', formProduct.Deskripsi || '');
+
+      if (selectedFiles && selectedFiles.length > 0) {
+        selectedFiles.forEach((file) => {
+          formData.append('image', file);
+        });
+      }
+
+      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
       axios.post('http://localhost:5000/api/produk', formData, config)
         .then(() => {
           toast.success('Produk berhasil ditambahkan!');
           resetFormProduct();
           setSelectedFiles([]);
           fetchProducts();
+          if (inputFileRef.current) inputFileRef.current.value = '';
         })
         .catch((err) => toast.error('Gagal tambah produk: ' + (err.response?.data?.error || err.message)));
     }
   };
 
   const handleEditClick = (product) => {
-    setEditId(product.ID); // Kunci ID produk yang mau diedit
+    setEditId(product.ID);
 
     setIsEditOpen(true)
     setSelectedProductToEdit(product)
@@ -197,21 +205,29 @@ function App() {
 
   const resetFormProduct = () => {
     setEditId(null);
-    setFormProduct({ Kodeproduk: '', Namaproduk: '', Kategori: '', Harga: '', Stok: '', Deskripsi: '' });
+    setFormProduct({ Kodeproduk: '', Namaproduk: '', Kategori: '', Harga: '', Stok: '', Deskripsi: '', Gambar: '' });
     setSelectedFiles([]);
   };
 
   // 5. LOGIKA HAPUS PRODUK
   const handleDeleteProduct = (id) => {
-    if (window.confirm('Yakin ingin menghapus produk ini?')) {
-      axios.delete(`http://localhost:5000/api/produk/${id}`)
-        .then(() => {
-          toast.success('Produk berhasil dihapus!');
-          if (editId === id) resetFormProduct();
-          fetchProducts();
-        })
-        .catch((err) => toast.error('Gagal hapus produk: ' + (err.response?.data?.error || err.message)));
-    }
+    Swal.fire({
+      title: 'Hapus Produk?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(`http://localhost:5000/api/produk/${id}`)
+          .then(() => {
+            toast.success('Produk berhasil dihapus!');
+            if (editId === id) resetFormProduct();
+            fetchProducts();
+          })
+          .catch((err) => toast.error('Gagal hapus produk: ' + (err.response?.data?.error || err.message)));
+      }
+    });
   };
 
   const handleLoginSuccess = (userData) => {
@@ -300,10 +316,8 @@ function App() {
         />
       )}
 
-      {/* VIEW: KATALOG PEMBELI */}
-      {currentView === 'pembeli' && (
+      {currentView === 'pembeli' && authView === null && (
         <>
-          {/* HERO BANNER SECTION */}
           <section className="relative w-full min-h-[500px] md:min-h-[600px] flex items-center bg-black py-20 px-4 md:px-8 overflow-hidden">
             <img
               src={BgFolklore}
@@ -326,7 +340,8 @@ function App() {
             </div>
           </section>
 
-          {/* GRID PRODUK */}
+          <AboutUs />
+
           <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-slate-100" id='catalogue'>
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-slate-800 tracking-tight sm:text-3xl font-folklore">
@@ -348,14 +363,12 @@ function App() {
                       setSelectedProductToDetail(product);
                       setisDetailOpen(true)
                     }}>
-                      {/* Card dengan foto dan button */}
                       <div
                         className={`group relative bg-white rounded-sm p-3 pb-8 flex flex-col transition-all duration-300 ${tiltClass} hover:rotate-0 hover:shadow-2xl cursor-pointer border border-slate-300 shadow-md`}
                         style={{
                           perspective: '1000px',
                         }}
                       >
-                        {/* Foto Produk */}
                         <div className="w-full aspect-square overflow-hidden bg-slate-100 mb-6" style={{ borderRadius: '4px' }}>
                           <ProductImageSlider
                             gambarString={product.Gambar}
@@ -363,7 +376,6 @@ function App() {
                           />
                         </div>
 
-                        {/* Button */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -408,6 +420,14 @@ function App() {
         />
       )}
 
+      {currentView === 'archive' && (
+        <Archive
+          products={products}
+          handleRealAddToCart={handleRealAddToCart}
+          setCurrentView={setCurrentView}
+        />
+      )}
+
       {currentView === 'history' && (
         <OrderHistory
           user={user}
@@ -415,12 +435,10 @@ function App() {
         />
       )}
 
-      {/* VIEW: DASHBOARD ADMIN */}
       {currentView === 'admin' && (
         <section className="w-full max-w-[1600px] mx-auto py-10 px-4 md:px-8 bg-[#b2b2b2]/10 rounded-3xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
 
-            {/* FORM INPUT PRODUK (ADD ONLY) */}
             <div className="bg-[#838383] p-6 rounded-3xl border border-[#545454]/30 shadow-md space-y-4 w-full">
               <h3 className="text-lg font-bold text-[#000000] font-folklore">Add New Product</h3>
               <form onSubmit={handleSaveProduct} className="space-y-3">
@@ -482,10 +500,21 @@ function App() {
                   </div>
                 </div>
                 <div>
+                  <label className="text-xs font-semibold text-[#1a1a1a]">Description</label>
+                  <textarea
+                    placeholder="It's a good thing, to buy, etc"
+                    value={formProduct.Deskripsi}
+                    onChange={(e) => setFormProduct({ ...formProduct, Deskripsi: e.target.value })}
+                    className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383] min-h-[100px] resize-y" // Ditambah min-h dan resize agar bisa ditarik
+                    required
+                  />
+                </div>
+                <div>
                   <label className="text-xs font-semibold text-[#1a1a1a]">Upload Picture</label>
                   <input
                     type="file"
                     multiple
+                    ref={inputFileRef}
                     onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
                     className="w-full text-xs mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1a1a1a] file:text-[#b2b2b2] hover:file:bg-[#000000] file:transition-colors text-[#1a1a1a]"
                   />
@@ -500,7 +529,6 @@ function App() {
               </form>
             </div>
 
-            {/* TABEL INVENTARIS PRODUK DENGAN TOMBOL EDIT & HAPUS */}
             <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-[#b2b2b2]/40 shadow-md w-full">
               <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Product List</h3>
               <div className="overflow-x-auto">

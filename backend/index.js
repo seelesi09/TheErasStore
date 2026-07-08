@@ -171,7 +171,7 @@ app.get('/api/produk', (req, res) => {
 
 // Endpoint Add Produk
 app.post('/api/produk', upload.array('image', 10), (req, res) => {
-    const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar } = req.body;
+    const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar, Deskripsi } = req.body;
 
     if (!Kodeproduk || !Namaproduk || !Kategori || !Harga || !Stok || !Deskripsi) {
         return res.status(400).json({ error: 'Semua field (kecuali gambar) harus diisi' });
@@ -184,9 +184,9 @@ app.post('/api/produk', upload.array('image', 10), (req, res) => {
         pathGambar = Gambar;
     }
 
-    const query = 'INSERT INTO Produk (Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar) VALUES (?, ?, ?, ?, ?, ?)';
+    const query = 'INSERT INTO Produk (Kodeproduk, Namaproduk, Kategori, Harga, Stok, Deskripsi, Gambar) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-    db.query(query, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, pathGambar], (err, result) => {
+    db.query(query, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, Deskripsi, pathGambar], (err, result) => {
         if (err) {
             console.error('Error adding product:', err.message);
             return res.status(500).json({ error: err.message });

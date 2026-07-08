@@ -22,6 +22,12 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                 </button>
 
                 <button
+                    onClick={() => setCurrentView('archive')}
+                    className={`hover:text-white transition-colors cursor-pointer ${currentView === 'archive' ? 'text-white font-bold' : ''}`}>
+                    Archive
+                </button>
+
+                <button
                     onClick={() => setCurrentView('cart')}
                     className={`hover:text-white transition-colors cursor-pointer ${currentView === 'cart' ? 'text-white font-bold' : ''}`}>
                     Cart
