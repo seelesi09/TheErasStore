@@ -49,7 +49,7 @@ function AboutUs() {
         },
         tloas: {
             song: "The Fate Of Ophelia",
-            quote: "Keep it 100 on the land, the sea, the sky"
+            quote: '"Keep it 100 on the land, the sea, the sky"'
         }
     };
     const lyricQuotesArray = Object.values(lyrics).map(

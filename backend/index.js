@@ -288,30 +288,48 @@ app.post('/api/produk/decrease-stock', async (req, res) => {
 });
 
 // Tambah ke keranjang
-// Tambah ke keranjang
 app.post('/api/keranjang', (req, res) => {
     const { User_ID, Produk_ID } = req.body;
 
-    const quertCheck = "Select * from keranjang where User_ID = ? and Produk_ID = ?";
-
-    db.query(quertCheck, [User_ID, Produk_ID], (err, result) => {
+    const queryCheckStock = "SELECT Stok FROM Produk WHERE ID = ?";
+    db.query(queryCheckStock, [Produk_ID], (err, productResult) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        if (result.length > 0) {
-            const queryUpdate = 'update keranjang set Jumlah = Jumlah + 1 where User_ID = ? and Produk_ID = ?';
-            db.query(queryUpdate, [User_ID, Produk_ID], (err, updateResult) => {
-                if (err) return res.status(500).json({ error: err.message });
-                return res.json({ message: "Jumlah Produk Di Keranjang Berhasil Ditambah" });
-            });
-        } else {
-            const queryInsert = 'Insert into keranjang (User_ID, Produk_ID, Jumlah) values (?, ?, 1)';
-            db.query(queryInsert, [User_ID, Produk_ID], (err, insertResult) => {
-                if (err) {
-                    return res.status(500).json({ error: err.message });
-                }
-                return res.status(201).json({ message: 'Produk berhasil dimasukkan ke keranjang' });
-            });
+        if (productResult.length === 0) {
+            return res.status(404).json({ message: "Produk tidak ditemukan" });
         }
+
+        const stokTersedia = productResult[0].Stok;
+
+        if (stokTersedia <= 0) {
+            return res.status(400).json({ message: "Maaf, stok produk ini sudah habis!" });
+        }
+
+        const quertCheck = "Select * from keranjang where User_ID = ? and Produk_ID = ?";
+        db.query(quertCheck, [User_ID, Produk_ID], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+
+            if (result.length > 0) {
+                const jumlahAkanDatang = result[0].Jumlah + 1;
+                if (jumlahAkanDatang > stokTersedia) {
+                    return res.status(400).json({
+                        message: `Gagal menambah! Stok tidak mencukupi. Hanya tersisa ${stokTersedia} pcs.`
+                    });
+                }
+
+                const queryUpdate = 'update keranjang set Jumlah = Jumlah + 1 where User_ID = ? and Produk_ID = ?';
+                db.query(queryUpdate, [User_ID, Produk_ID], (err, updateResult) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    return res.json({ message: "Jumlah Produk Di Keranjang Berhasil Ditambah" });
+                });
+            } else {
+                const queryInsert = 'Insert into keranjang (User_ID, Produk_ID, Jumlah) values (?, ?, 1)';
+                db.query(queryInsert, [User_ID, Produk_ID], (err, insertResult) => {
+                    if (err) return res.status(500).json({ error: err.message });
+                    return res.status(201).json({ message: 'Produk berhasil dimasukkan ke keranjang' });
+                });
+            }
+        });
     });
 });
 
@@ -350,59 +368,84 @@ app.put('/api/keranjang/:id', (req, res) => {
         return res.status(400).json({ message: 'Jumlah Minimal Adalah 1' });
     }
 
-    const query = 'update keranjang set Jumlah = ? where ID = ?';
-    db.query(query, [Jumlah, id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
+    const queryGetProduct = "SELECT k.Produk_ID, p.Stok FROM keranjang k JOIN Produk p ON k.Produk_ID = p.ID WHERE k.ID = ?";
+    db.query(queryGetProduct, [id], (err, productResult) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (productResult.length === 0) return res.status(404).json({ message: "Data keranjang tidak ditemukan" });
+
+        const stokTersedia = productResult[0].Stok;
+
+        if (Jumlah > stokTersedia) {
+            return res.status(400).json({
+                message: `Gagal mengubah jumlah. Stok tidak mencukupi, hanya tersisa ${stokTersedia} pcs.`
+            });
         }
-        return res.json({ message: "Jumlah Berhasil Diperbarui" })
+
+        const queryUpdate = 'update keranjang set Jumlah = ? where ID = ?';
+        db.query(queryUpdate, [Jumlah, id], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            return res.json({ message: "Jumlah Berhasil Diperbarui" });
+        });
     });
 });
 
 // checkout 
-app.post('/api/checkout', (req, res) => {
+app.post('/api/checkout', async (req, res) => {
     const { User_ID, Total_Harga } = req.body;
 
     if (!User_ID || !Total_Harga) {
         return res.status(400).json({ message: "data tidak lengkap" });
     }
 
-    const queryGetCart = `
-    select k.Produk_ID, k.Jumlah, p.Harga
-    from keranjang k 
-    join produk p on k.Produk_ID = p.ID
-    where k.User_ID = ?
-    `;
+    try {
+        const queryGetCart = `
+            SELECT k.Produk_ID, k.Jumlah, p.Harga, p.Stok
+            FROM keranjang k 
+            JOIN Produk p ON k.Produk_ID = p.ID
+            WHERE k.User_ID = ?
+        `;
+        const [cartItems] = await db.promise().query(queryGetCart, [User_ID]);
 
-    db.query(queryGetCart, [User_ID], (err, cartItems) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (cartItems.length === 0) return res.status(400).json({ message: "Keranjang Kosong!" });
+        if (cartItems.length === 0) {
+            return res.status(400).json({ message: "Keranjang Kosong!" });
+        }
 
-        const queryInsertOrder = "insert into orders (User_ID, Total_Harga) values (?, ?)";
-        db.query(queryInsertOrder, [User_ID, Total_Harga], (err, orderResult) => {
-            if (err) return res.status(500).json({ error: err.message });
+        for (const item of cartItems) {
+            if (item.Stok < item.Jumlah) {
+                return res.status(400).json({
+                    message: `Gagal Checkout! Stok tidak mencukupi.`
+                });
+            }
+        }
 
-            const newOrderId = orderResult.insertId;
+        const queryInsertOrder = "INSERT INTO orders (User_ID, Total_Harga, Status) VALUES (?, ?, 'Pending')";
+        const [orderResult] = await db.promise().query(queryInsertOrder, [User_ID, Total_Harga]);
+        const newOrderId = orderResult.insertId;
 
-            const orderItemsData = cartItems.map(item => [
-                newOrderId,
-                item.Produk_ID,
-                item.Jumlah,
-                item.Harga
-            ]);
+        const orderItemsData = cartItems.map(item => [
+            newOrderId,
+            item.Produk_ID,
+            item.Jumlah,
+            item.Harga
+        ]);
+        const queryInsertItems = 'INSERT INTO order_items (Order_ID, Produk_ID, Jumlah, Harga_Beli) VALUES ?';
+        await db.promise().query(queryInsertItems, [orderItemsData]);
 
-            const queryInsertItems = 'insert into order_items (Order_ID, Produk_ID, Jumlah, Harga_Beli) values ?';
-            db.query(queryInsertItems, [orderItemsData], (err) => {
-                if (err) return res.status(500).json({ error: err.message });
+        for (const item of cartItems) {
+            const queryUpdateStock = "UPDATE Produk SET Stok = Stok - ? WHERE ID = ?";
+            await db.promise().query(queryUpdateStock, [item.Jumlah, item.Produk_ID]);
+            console.log(`[SUKSES MEMOTONG STOK] Produk ID ${item.Produk_ID} berkurang sebanyak ${item.Jumlah}`);
+        }
 
-                const queryEmptyCart = "delete from keranjang where User_ID = ?";
-                db.query(queryEmptyCart, [User_ID], (err) => {
-                    if (err) return res.status(500).json({ error: err.message });
-                    return res.json({ message: "Checkout Berhasil", Order_ID: newOrderId });
-                })
-            });
-        });
-    });
+        const queryEmptyCart = "DELETE FROM keranjang WHERE User_ID = ?";
+        await db.promise().query(queryEmptyCart, [User_ID]);
+
+        return res.json({ message: "Checkout Berhasil", Order_ID: newOrderId });
+
+    } catch (err) {
+        console.error("Terjadi kesalahan saat checkout:", err.message);
+        return res.status(500).json({ error: "Proses checkout gagal: " + err.message });
+    }
 });
 
 // History Order 
@@ -451,6 +494,58 @@ app.get('/api/orders/:userId', (req, res) => {
     });
 });
 
+// Endpoint Konfirmasi Pembayaran
+app.post('/api/payment/confirm', upload.single('image'), (req, res) => {
+    const { Order_ID } = req.body;
+
+    if (!Order_ID || !req.file) {
+        return res.status(400).json({ message: "Order ID dan foto bukti transfer wajib diisi/diunggah!" });
+    }
+
+    const pathBukti = `http://localhost:5000/uploads/${req.file.filename}`;
+
+    const queryUpdateOrder = "UPDATE orders SET Status = 'Success', Bukti_Bayar = ? WHERE ID = ?";
+
+    db.query(queryUpdateOrder, [pathBukti, Order_ID], (err, result) => {
+        if (err) {
+            console.error("Error saat konfirmasi pembayaran:", err.message);
+            return res.status(500).json({ error: err.message }); // Sudah diperbaiki dari 'message' menjadi 'err.message'
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Order ID tidak ditemukan" });
+        }
+
+        return res.json({
+            success: true,
+            message: "Payment Has Been Confirmed, Status updated to Success!",
+            bukti_url: pathBukti
+        });
+    });
+});
+
+app.get('/api/admin/orders', (req, res) => {
+    const query = `
+    SELECT 
+    o.ID AS Order_ID,          
+    o.Total_Harga, 
+    o.Tanggal_Order, 
+    o.Status, 
+    o.Bukti_Bayar,
+    l.Username AS Nama_Customer 
+FROM orders o
+JOIN login l ON o.User_ID = l.ID
+ORDER BY o.Tanggal_Order DESC;
+    `;
+
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error fetching admin orders: ', error);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
 
 const PORT = 5000;
 app.listen(PORT, () => {

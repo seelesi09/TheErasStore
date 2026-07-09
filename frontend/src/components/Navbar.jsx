@@ -42,9 +42,10 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                 {isAdmin && (
                     <button
                         onClick={() => setCurrentView('admin')}
-                        className={`hover:text-white transition-colors cursor-pointer ${currentView === 'admin' ? 'text-white font-bold' : ''}`}
+                        className={`hover:text-white transition-colors cursor-pointer ${currentView === 'admin' ? 'text-white font-bold' : ''
+                            }`}
                     >
-                        Admin Dashboard
+                        Admin Panel
                     </button>
                 )}
                 {user && (

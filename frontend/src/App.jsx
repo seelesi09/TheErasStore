@@ -13,6 +13,8 @@ import Cart from './components/Cart';
 import OrderHistory from './components/Orderhistory';
 import AboutUs from './components/AboutUs';
 import Archive from './components/Archive';
+import Payment from './components/Payment';
+import AdminOrders from './components/Adminorders';
 import BgFolklore from './assets/picture/dashboard-folklore (1).jpg';
 
 // Custom toast wrapper using SweetAlert2
@@ -43,7 +45,7 @@ function App() {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('shopey_user');
     return savedUser ? JSON.parse(savedUser) : null;
-  })
+  });
 
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem('shopey_cart');
@@ -55,8 +57,13 @@ function App() {
   }, [cart]);
 
   const [authView, setAuthView] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
+  const [currentTotalHarga, setCurrentTotalHarga] = useState(0);
 
   const [currentView, setCurrentView] = useState('pembeli');
+
+  // STATE BARU: Untuk navigasi internal menu admin ('products' atau 'payments')
+  const [adminTab, setAdminTab] = useState('products');
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,7 +99,7 @@ function App() {
   };
 
   useEffect(() => {
-    const fetchProduk = async () => {
+    const fetchOriginalProducts = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/produk');
         setProducts(response.data);
@@ -103,7 +110,7 @@ function App() {
       }
     };
 
-    fetchProduk();
+    fetchOriginalProducts();
   }, []);
 
   const handleLogin = (e) => {
@@ -119,7 +126,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('shopey_user')
+    localStorage.removeItem('shopey_user');
     setUser(null);
     setCurrentView('pembeli');
     toast.success('Berhasil Logout!');
@@ -189,9 +196,8 @@ function App() {
 
   const handleEditClick = (product) => {
     setEditId(product.ID);
-
-    setIsEditOpen(true)
-    setSelectedProductToEdit(product)
+    setIsEditOpen(true);
+    setSelectedProductToEdit(product);
 
     setFormProduct({
       Kodeproduk: product.Kodeproduk,
@@ -209,7 +215,6 @@ function App() {
     setSelectedFiles([]);
   };
 
-  // 5. LOGIKA HAPUS PRODUK
   const handleDeleteProduct = (id) => {
     Swal.fire({
       title: 'Hapus Produk?',
@@ -233,41 +238,12 @@ function App() {
   const handleLoginSuccess = (userData) => {
     setUser(userData);
     localStorage.setItem('shopey_user', JSON.stringify(userData));
-    setAuthView(null)
+    setAuthView(null);
 
-    if (userData?.Role === 'admin' || userData?.Role === 'admin') {
+    if (userData?.Role === 'admin') {
       setCurrentView('admin');
     } else {
       setCurrentView('pembeli');
-    }
-  }
-
-  const handleAddToCollection = async (productID) => {
-    try {
-      const body = {
-        productId: productID,
-      };
-
-      const response = await fetch('http://localhost:5000/api/produk/decrease-stock', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body),
-      });
-
-
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(`Added to Collection!\n `);
-        fetchProducts();
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.message}`)
-      }
-    } catch (error) {
-      console.error('Error: ', error);
-      alert('There had an Error');
     }
   };
 
@@ -283,11 +259,17 @@ function App() {
         Produk_ID: productID
       });
 
-      toast.success(response.data.message || "The Product Succesfully Added to Your Cart");
+      toast.success(response.data.message || "The Product Successfully Added to Your Cart");
     } catch (error) {
-      console.error('Error Add to Cart:', error)
-      toast.error(error.response?.data?.error || "Unable to Add Product")
+      console.error('Error Add to Cart:', error);
+      toast.error(error.response?.data?.error || "Unable to Add Product");
     }
+  };
+
+  const handleGoToPayment = (orderId, totalHarga) => {
+    setCurrentOrderId(orderId);
+    setCurrentTotalHarga(totalHarga);
+    setCurrentView('payment');
   };
 
   return (
@@ -297,6 +279,7 @@ function App() {
         user={user}
         currentView={currentView}
         setCurrentView={setCurrentView}
+        setAdminTab={setAdminTab}
         handleLogout={handleLogout}
         onOpenLogin={() => setAuthView('login')}
       />
@@ -361,13 +344,11 @@ function App() {
                   return (
                     <div key={product.ID} className="flex flex-col" onClick={() => {
                       setSelectedProductToDetail(product);
-                      setisDetailOpen(true)
+                      setisDetailOpen(true);
                     }}>
                       <div
                         className={`group relative bg-white rounded-sm p-3 pb-8 flex flex-col transition-all duration-300 ${tiltClass} hover:rotate-0 hover:shadow-2xl cursor-pointer border border-slate-300 shadow-md`}
-                        style={{
-                          perspective: '1000px',
-                        }}
+                        style={{ perspective: '1000px' }}
                       >
                         <div className="w-full aspect-square overflow-hidden bg-slate-100 mb-6" style={{ borderRadius: '4px' }}>
                           <ProductImageSlider
@@ -387,7 +368,6 @@ function App() {
                         </button>
                       </div>
 
-                      {/* Info Produk */}
                       <div className="mt-6 px-1">
                         <span className="text-[15px] font-folklore font-bold tracking-widest text-slate-600">
                           {product.Kategori}
@@ -399,7 +379,7 @@ function App() {
                           <p className="text-lg font-folklore font-bold text-slate-800">
                             Rp {Number(product.Harga).toLocaleString('id-ID')}
                           </p>
-                          <span className="text-xs  text-slate-600 font-folklore">
+                          <span className="text-xs text-slate-600 font-folklore">
                             Stock: {product.Stok}
                           </span>
                         </div>
@@ -417,6 +397,15 @@ function App() {
         <Cart
           user={user}
           setCurrentView={setCurrentView}
+          onCheckoutSuccess={handleGoToPayment}
+        />
+      )}
+
+      {currentView === 'payment' && (
+        <Payment
+          Order_ID={currentOrderId}
+          Total_Harga={currentTotalHarga}
+          setCurrentView={setCurrentView}
         />
       )}
 
@@ -432,153 +421,191 @@ function App() {
         <OrderHistory
           user={user}
           setCurrentView={setCurrentView}
+          setOrderInput={(orderData) => {
+            setCurrentOrderId(orderData.id);
+            setCurrentTotalHarga(orderData.total);
+          }}
         />
       )}
 
       {currentView === 'admin' && (
-        <section className="w-full max-w-[1600px] mx-auto py-10 px-4 md:px-8 bg-[#b2b2b2]/10 rounded-3xl">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
+        <section className="w-full max-w-[1600px] mx-auto py-10 px-4 md:px-8 bg-[#b2b2b2]/10 rounded-3xl space-y-8">
 
-            <div className="bg-[#838383] p-6 rounded-3xl border border-[#545454]/30 shadow-md space-y-4 w-full">
-              <h3 className="text-lg font-bold text-[#000000] font-folklore">Add New Product</h3>
-              <form onSubmit={handleSaveProduct} className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-[#1a1a1a]">Product Code</label>
-                  <input
-                    type="text"
-                    placeholder="P001"
-                    value={formProduct.Kodeproduk}
-                    onChange={(e) => setFormProduct({ ...formProduct, Kodeproduk: e.target.value })}
-                    className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#1a1a1a]">Name of the Product</label>
-                  <input
-                    type="text"
-                    placeholder="TTPD Vinyl"
-                    value={formProduct.Namaproduk}
-                    onChange={(e) => setFormProduct({ ...formProduct, Namaproduk: e.target.value })}
-                    className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#1a1a1a]">Category</label>
-                  <input
-                    type="text"
-                    placeholder="Vinyl, CD, Outfit"
-                    value={formProduct.Kategori}
-                    onChange={(e) => setFormProduct({ ...formProduct, Kategori: e.target.value })}
-                    className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
-                    required
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
+          <div className="flex border-b border-slate-300 font-folklore text-sm gap-6 pb-2">
+            <button
+              onClick={() => setAdminTab('products')}
+              className={`pb-2 font-bold tracking-wide transition-all ${adminTab === 'products'
+                  ? 'text-black border-b-2 border-black'
+                  : 'text-slate-400 hover:text-slate-700'
+                }`}
+            >
+              📦 Manage Products
+            </button>
+            <button
+              onClick={() => setAdminTab('payments')}
+              className={`pb-2 font-bold tracking-wide transition-all ${adminTab === 'payments'
+                  ? 'text-black border-b-2 border-black'
+                  : 'text-slate-400 hover:text-slate-700'
+                }`}
+            >
+              💰 Customer Payments
+            </button>
+          </div>
+
+          {/* TAB 1: MANAGE PRODUCTS SECTION */}
+          {adminTab === 'products' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
+              {/* Form Input Produk */}
+              <div className="bg-[#838383] p-6 rounded-3xl border border-[#545454]/30 shadow-md space-y-4 w-full">
+                <h3 className="text-lg font-bold text-[#000000] font-folklore">Add New Product</h3>
+                <form onSubmit={handleSaveProduct} className="space-y-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Price</label>
+                    <label className="text-xs font-semibold text-[#1a1a1a]">Product Code</label>
                     <input
-                      type="number"
-                      placeholder="150000"
-                      value={formProduct.Harga}
-                      onChange={(e) => setFormProduct({ ...formProduct, Harga: e.target.value })}
+                      type="text"
+                      placeholder="P001"
+                      value={formProduct.Kodeproduk}
+                      onChange={(e) => setFormProduct({ ...formProduct, Kodeproduk: e.target.value })}
                       className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Stock</label>
+                    <label className="text-xs font-semibold text-[#1a1a1a]">Name of the Product</label>
                     <input
-                      type="number"
-                      placeholder="10"
-                      value={formProduct.Stok}
-                      onChange={(e) => setFormProduct({ ...formProduct, Stok: e.target.value })}
+                      type="text"
+                      placeholder="TTPD Vinyl"
+                      value={formProduct.Namaproduk}
+                      onChange={(e) => setFormProduct({ ...formProduct, Namaproduk: e.target.value })}
                       className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
                       required
                     />
                   </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#1a1a1a]">Description</label>
-                  <textarea
-                    placeholder="It's a good thing, to buy, etc"
-                    value={formProduct.Deskripsi}
-                    onChange={(e) => setFormProduct({ ...formProduct, Deskripsi: e.target.value })}
-                    className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383] min-h-[100px] resize-y" // Ditambah min-h dan resize agar bisa ditarik
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#1a1a1a]">Upload Picture</label>
-                  <input
-                    type="file"
-                    multiple
-                    ref={inputFileRef}
-                    onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
-                    className="w-full text-xs mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1a1a1a] file:text-[#b2b2b2] hover:file:bg-[#000000] file:transition-colors text-[#1a1a1a]"
-                  />
-                </div>
+                  <div>
+                    <label className="text-xs font-semibold text-[#1a1a1a]">Category</label>
+                    <input
+                      type="text"
+                      placeholder="Vinyl, CD, Outfit"
+                      value={formProduct.Kategori}
+                      onChange={(e) => setFormProduct({ ...formProduct, Kategori: e.target.value })}
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
+                      required
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-[#1a1a1a]">Price</label>
+                      <input
+                        type="number"
+                        placeholder="150000"
+                        value={formProduct.Harga}
+                        onChange={(e) => setFormProduct({ ...formProduct, Harga: e.target.value })}
+                        className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-[#1a1a1a]">Stock</label>
+                      <input
+                        type="number"
+                        placeholder="10"
+                        value={formProduct.Stok}
+                        onChange={(e) => setFormProduct({ ...formProduct, Stok: e.target.value })}
+                        className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383]"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-[#1a1a1a]">Description</label>
+                    <textarea
+                      placeholder="It's a good thing, to buy, etc"
+                      value={formProduct.Deskripsi}
+                      onChange={(e) => setFormProduct({ ...formProduct, Deskripsi: e.target.value })}
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-xl focus:outline-none focus:border-[#000000] placeholder-[#838383] min-h-[100px] resize-y"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-[#1a1a1a]">Upload Picture</label>
+                    <input
+                      type="file"
+                      multiple
+                      ref={inputFileRef}
+                      onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
+                      className="w-full text-xs mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1a1a1a] file:text-[#b2b2b2] hover:file:bg-[#000000] file:transition-colors text-[#1a1a1a]"
+                    />
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-2.5 text-white font-semibold text-sm rounded-xl transition-colors mt-2 bg-[#1a1a1a] hover:bg-[#000000] shadow-md"
-                >
-                  Save to Database
-                </button>
-              </form>
-            </div>
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 text-white font-semibold text-sm rounded-xl transition-colors mt-2 bg-[#1a1a1a] hover:bg-[#000000] shadow-md"
+                  >
+                    Save to Database
+                  </button>
+                </form>
+              </div>
 
-            <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-[#b2b2b2]/40 shadow-md w-full">
-              <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Product List</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-[#545454]">
-                  <thead className="bg-[#b2b2b2]/20 text-[#1a1a1a] text-xs uppercase font-bold">
-                    <tr>
-                      <th className="p-3">Picture</th>
-                      <th className="p-3">Name</th>
-                      <th className="p-3">Price</th>
-                      <th className="p-3">Stock</th>
-                      <th className="p-3 text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#b2b2b2]/30">
-                    {products.map((p) => (
-                      <tr key={p.ID} className="hover:bg-[#b2b2b2]/10 transition-colors">
-                        <td className="p-3">
-                          <img
-                            src={p.Gambar ? p.Gambar.split(',')[0] : 'https://via.placeholder.com/50'}
-                            alt={p.Namaproduk}
-                            className="w-10 h-10 object-contain bg-[#b2b2b2]/20 rounded-lg"
-                          />
-                        </td>
-                        <td className="p-3 font-medium text-[#000000]">{p.Namaproduk}</td>
-                        <td className="p-3 text-[#1a1a1a]">Rp {Number(p.Harga).toLocaleString('id-ID')}</td>
-                        <td className="p-3 font-semibold text-[#1a1a1a]">{p.Stok}</td>
-                        <td className="p-3 text-center flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => handleEditClick(p)}
-                            className="px-3 py-1 text-xs font-bold text-white bg-[#545454] rounded-lg hover:bg-[#1a1a1a] transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProduct(p.ID)}
-                            className="px-3 py-1 text-xs font-bold text-white bg-[#838383] rounded-lg hover:bg-[#545454] transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </td>
+              {/* Daftar Produk Tabel */}
+              <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-[#b2b2b2]/40 shadow-md w-full">
+                <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Product List</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm text-[#545454]">
+                    <thead className="bg-[#b2b2b2]/20 text-[#1a1a1a] text-xs uppercase font-bold">
+                      <tr>
+                        <th className="p-3">Picture</th>
+                        <th className="p-3">Name</th>
+                        <th className="p-3">Price</th>
+                        <th className="p-3">Stock</th>
+                        <th className="p-3 text-center">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#b2b2b2]/30">
+                      {products.map((p) => (
+                        <tr key={p.ID} className="hover:bg-[#b2b2b2]/10 transition-colors">
+                          <td className="p-3">
+                            <img
+                              src={p.Gambar ? p.Gambar.split(',')[0] : 'https://via.placeholder.com/50'}
+                              alt={p.Namaproduk}
+                              className="w-10 h-10 object-contain bg-[#b2b2b2]/20 rounded-lg"
+                            />
+                          </td>
+                          <td className="p-3 font-medium text-[#000000]">{p.Namaproduk}</td>
+                          <td className="p-3 text-[#1a1a1a]">Rp {Number(p.Harga).toLocaleString('id-ID')}</td>
+                          <td className="p-3 font-semibold text-[#1a1a1a]">{p.Stok}</td>
+                          <td className="p-3 text-center flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEditClick(p)}
+                              className="px-3 py-1 text-xs font-bold text-white bg-[#545454] rounded-lg hover:bg-[#1a1a1a] transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(p.ID)}
+                              className="px-3 py-1 text-xs font-bold text-white bg-[#838383] rounded-lg hover:bg-[#545454] transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
+          )}
 
-          </div>
+          {/* TAB 2: CUSTOMER PAYMENTS SECTION */}
+          {adminTab === 'payments' && (
+            <div className="w-full">
+              <AdminOrders />
+            </div>
+          )}
+
         </section>
       )}
+
       <Footer />
 
       <Edit
@@ -658,13 +685,11 @@ function ProductImageSlider({ gambarString, namaProduk }) {
             </svg>
           </button>
 
-          {/* Indikator Titik (Dots) di Bawah */}
           <div className='absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-black/20 px-2 py-1 rounded-full backdrop-blur-[2px]'>
             {images.map((_, index) => (
               <span
                 key={index}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-white w-3' : 'bg-white/40'
-                  }`}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-white w-3' : 'bg-white/40'}`}
               ></span>
             ))}
           </div>

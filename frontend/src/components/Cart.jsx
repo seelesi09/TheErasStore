@@ -25,7 +25,7 @@ const toast = {
     }
 };
 
-function Cart({ user, setCurrentView }) {
+function Cart({ user, setCurrentView, onCheckoutSuccess }) {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -111,20 +111,30 @@ function Cart({ user, setCurrentView }) {
             if (result.isConfirmed) {
                 try {
                     const userId = user.ID || user.id;
-                    await axios.post('http://localhost:5000/api/checkout', {
+                    const totalHarga = calculateTotal();
+
+                    const response = await axios.post('http://localhost:5000/api/checkout', {
                         User_ID: userId,
-                        Total_Harga: calculateTotal()
+                        Total_Harga: totalHarga
                     });
 
-                    toast.success('Checkout Successful! Thank you.');
-                    setCurrentView('history'); // Pindah halaman otomatis ke view history setelah sukses!
+                    const orderIdDariBackend = response.data.Order_ID;
+
+                    if (orderIdDariBackend) {
+                        toast.success('Checkout Successful! Redirecting to payment...');
+
+                        onCheckoutSuccess(orderIdDariBackend, totalHarga);
+                    } else {
+                        toast.error('Backend did not return Order ID');
+                    }
+
                 } catch (error) {
                     console.error('Gagal melakukan checkout:', error);
                     toast.error('Checkout failed, please try again.');
                 }
             }
         });
-    };
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-16 px-6 md:px-12 lg:px-24">
