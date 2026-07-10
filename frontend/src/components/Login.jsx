@@ -56,14 +56,11 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
         allowOutsideClick: false,
         allowEscapeKey: false
       }).then(() => {
-        // Reset form
         setUsername('');
         setPassword('');
-        // // Panggil callback function props
-        // onLoginSuccess(response.data.user);
+
       });
     } catch (error) {
-      // Login gagal
       const errorMessage = error.response?.data?.message || error.message || 'There had an error while login';
 
       Swal.fire({

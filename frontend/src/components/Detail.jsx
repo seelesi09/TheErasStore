@@ -3,16 +3,13 @@ import React from "react";
 export default function Detail({ isOpen, onClose, productData, onBuyNow }) {
     if (!isOpen || !productData) return null;
 
-    // Ambil gambar (antisipasi jika properti ditulis 'Gambar' atau 'gambar')
     const dataGambar = productData.Gambar || productData.gambar || "";
     const images = dataGambar ? dataGambar.split(',').map(img => img.trim()) : [];
     const mainImage = images.length > 0 ? images[0] : 'https://via.placeholder.com/360';
 
-    // Ambil harga (antisipasi 'Harga' atau 'harga')
     const dataHarga = productData.Harga || productData.harga || 0;
     const hargaProduk = Number(dataHarga);
 
-    // Ambil data lainnya (antisipasi huruf besar / kecil di awal)
     const namaProduk = productData.Namaproduk || productData.namaproduk || "Nama Produk Kosong";
     const kategoriProduk = productData.Kategori || productData.kategori || "";
     const deskripsiProduk = productData.Deskripsi || productData.deskripsi || "";

@@ -2,6 +2,22 @@ import React from "react";
 import TextType from "./TextType";
 
 function AboutUs() {
+
+    const images = {
+        debut: '',
+        fearless: '',
+        speakNow: '',
+        red: '',
+        album1989: '',
+        reputation: '',
+        lover: '',
+        folklore: '',
+        evermore: '',
+        midnights: '',
+        ttpd: '',
+        tloas: ''
+    }
+
     const lyrics = {
         debut: {
             song: "Our Song",

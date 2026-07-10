@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Detail from './Detail';
+import React, { useEffect, useRef, useState, Suspense, lazy } from 'react';
+const Detail = lazy(() => import('./Detail'));
 
 function Archive({ products, handleRealAddToCart, setCurrentView }) {
   const eras = [
@@ -14,7 +14,8 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
     { name: "evermore", bg: "bg-[#fef3c7]", text: "text-[#78350f]", border: "border-[#78350f]", audio: "/audio/9.mp3" },
     { name: "Midnights", bg: "bg-[#0f172a]", text: "text-[#93c5fd]", border: "border-[#93c5fd]", audio: "/audio/10.mp3" },
     { name: "The Tortured Poets Department", bg: "bg-[#f8f6f0]", text: "text-[#2d2d2d]", border: "border-[#2d2d2d]", audio: "/audio/11.mp3" },
-    { name: "The Life of a Showgirl", bg: "bg-[#ffedd5]", text: "text-[#ea580c]", border: "border-[#ea580c]", audio: "/audio/12.mp3" }
+    { name: "The Life of a Showgirl", bg: "bg-[#ffedd5]", text: "text-[#ea580c]", border: "border-[#ea580c]", audio: "/audio/12.mp3" },
+    { name: 'I Knew it, I knew You', bg: 'bg-[#fef3c7]', text: "text-[#b45309]", border: "border-[#b45309]", audio: '/audio/13.mp3' }
   ];
 
   const [currentBg, setCurrentBg] = useState("bg-[#f8fafc]");
@@ -138,7 +139,6 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
       </div>
 
       <div className="max-w-7xl mx-auto">
-        
         <button 
           onClick={() => setCurrentView('pembeli')}
           className={`mb-12 text-xs uppercase tracking-widest font-bold opacity-60 hover:opacity-100 transition-all flex items-center gap-2 ${isDarkBg ? 'text-white' : 'text-black'}`}
@@ -195,6 +195,7 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
                         >
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                           <img 
+                            loading="lazy" 
                             src={
                               gambarRaw && typeof gambarRaw === 'string'
                                 ? gambarRaw.split(',')[0].trim() 
@@ -233,20 +234,23 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
             );
           })}
         </div>
-
       </div>
 
-      <Detail
-        isOpen={isDetailOpen}
-        onClose={() => {
-          setIsDetailOpen(false);
-          setSelectedProductToDetail(null);
-        }}
-        productData={selectedProductToDetail}
-        onBuyNow={(prod) => {
-          handleRealAddToCart(prod?.ID || prod?.id);
-        }}
-      />
+      <Suspense fallback={null}>
+        {isDetailOpen && (
+          <Detail
+            isOpen={isDetailOpen}
+            onClose={() => {
+              setIsDetailOpen(false);
+              setSelectedProductToDetail(null);
+            }}
+            productData={selectedProductToDetail}
+            onBuyNow={(prod) => {
+              handleRealAddToCart(prod?.ID || prod?.id);
+            }}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

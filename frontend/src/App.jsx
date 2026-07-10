@@ -323,7 +323,7 @@ function App() {
             </div>
           </section>
 
-          <AboutUs />
+          <AboutUs id='about'/>
 
           <section className="py-16 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-slate-50 to-slate-100" id='catalogue'>
             <div className="mb-12">
@@ -336,7 +336,7 @@ function App() {
                 Memuat produk...
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
                 {products.map((product, index) => {
                   const isEven = index % 2 === 0;
                   const tiltClass = isEven ? '-rotate-3' : 'rotate-3';
@@ -439,7 +439,7 @@ function App() {
                   : 'text-slate-400 hover:text-slate-700'
                 }`}
             >
-              📦 Manage Products
+              Manage Products
             </button>
             <button
               onClick={() => setAdminTab('payments')}
@@ -448,15 +448,13 @@ function App() {
                   : 'text-slate-400 hover:text-slate-700'
                 }`}
             >
-              💰 Customer Payments
+              Customer Payments
             </button>
           </div>
 
-          {/* TAB 1: MANAGE PRODUCTS SECTION */}
           {adminTab === 'products' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start w-full">
-              {/* Form Input Produk */}
-              <div className="bg-[#838383] p-6 rounded-3xl border border-[#545454]/30 shadow-md space-y-4 w-full">
+              <div className="bg-[#b2b2b2] p-6 rounded-2xl border border-[#545454]/30 shadow-md space-y-4 w-full">
                 <h3 className="text-lg font-bold text-[#000000] font-folklore">Add New Product</h3>
                 <form onSubmit={handleSaveProduct} className="space-y-3">
                   <div>
@@ -546,8 +544,7 @@ function App() {
                 </form>
               </div>
 
-              {/* Daftar Produk Tabel */}
-              <div className="lg:col-span-2 bg-white p-6 rounded-3xl border border-[#b2b2b2]/40 shadow-md w-full">
+              <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-[#b2b2b2]/40 shadow-md w-full">
                 <h3 className="text-lg font-bold text-[#1a1a1a] mb-4">Product List</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm text-[#545454]">
