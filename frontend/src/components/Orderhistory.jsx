@@ -10,7 +10,7 @@ function OrderHistory({ user, setCurrentView, setOrderInput }) {
             if (!user) return;
             try {
                 const userId = user.ID || user.id;
-                const response = await axios.get(`theerasstore-production.up.railway.app/api/orders/${userId}`);
+                const response = await axios.get(`https://theerasstore-production.up.railway.app/api/orders/${userId}`);
                 setOrders(response.data);
             } catch (error) {
                 console.error('Gagal memuat riwayat order:', error);
