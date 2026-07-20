@@ -9,7 +9,7 @@ function AdminOrders() {
     // untuk menampilkan history order pada admin dashboard dari endpoint
     const fetchAdminOrders = async () => {
         try {
-            const response = await axios.get('theerasstore-production.up.railway.app/api/admin/orders');
+            const response = await axios.get('https://era-store.up.railway.app/theerasstore-production.up.railway.app/api/admin/orders');
             setOrders(response.data);
         } catch (error) {
             console.error('Gagal mengambil data order admin:', error);
