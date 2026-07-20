@@ -213,7 +213,7 @@ app.post('/api/login', (req, res) => {
 // ALBUMS
 // ============================================================
 
-// Endpoint Get All Albums (BARU — sebelumnya belum ada, makanya 404)
+// Endpoint Get All Albums
 app.get('/api/albums', (req, res) => {
     db.query('SELECT * FROM albums ORDER BY id ASC', (err, result) => {
         if (err) {
@@ -224,7 +224,7 @@ app.get('/api/albums', (req, res) => {
     });
 });
 
-// Endpoint Add Album (diperbaiki: dari await jadi callback, konsisten dgn endpoint lain)
+// Endpoint Add Album
 app.post('/api/albums', uploadAudio.single('audio'), (req, res) => {
     const { name, bg_color, text_color, border_color } = req.body;
 
@@ -245,7 +245,7 @@ app.post('/api/albums', uploadAudio.single('audio'), (req, res) => {
     });
 });
 
-// Endpoint Hapus Album (opsional, berguna buat admin)
+// Endpoint Hapus Album
 app.delete('/api/albums/:id', (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM albums WHERE id = ?';
@@ -266,11 +266,17 @@ app.delete('/api/albums/:id', (req, res) => {
 
 // ============================================================
 // PRODUK
+// (Catatan: nama tabel di database ternyata lowercase semua ->
+// "produk", bukan "Produk". Semua query di bawah sudah disamakan
+// ke lowercase supaya konsisten dan tidak error
+// "Table ... doesn't exist" di MySQL Linux yang case-sensitive.
+// Nama KOLOM tetap dibiarkan sesuai aslinya, misal Kodeproduk,
+// Namaproduk, Harga, dst — yang diganti cuma nama TABEL-nya.)
 // ============================================================
 
 // Endpoint Get All Produk
 app.get('/api/produk', (req, res) => {
-    db.query('SELECT * FROM Produk', (err, result) => {
+    db.query('SELECT * FROM produk', (err, result) => {
         if (err) {
             console.error('Error fetching products:', err);
             return res.status(500).json({ error: err.message });
@@ -294,7 +300,7 @@ app.post('/api/produk', upload.array('image', 10), (req, res) => {
         pathGambar = Gambar;
     }
 
-    const query = 'INSERT INTO Produk (Kodeproduk, Namaproduk, Kategori, Harga, Stok, Deskripsi, Gambar) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const query = 'INSERT INTO produk (Kodeproduk, Namaproduk, Kategori, Harga, Stok, Deskripsi, Gambar) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
     db.query(query, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, Deskripsi, pathGambar], (err, result) => {
         if (err) {
@@ -308,7 +314,7 @@ app.post('/api/produk', upload.array('image', 10), (req, res) => {
 // Endpoint Hapus Produk
 app.delete('/api/produk/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'DELETE FROM Produk WHERE ID = ?';
+    const query = 'DELETE FROM produk WHERE ID = ?';
 
     db.query(query, [id], (err, result) => {
         if (err) {
@@ -329,7 +335,7 @@ app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
     const { id } = req.params;
     const { Kodeproduk, Namaproduk, Kategori, Harga, Stok, Gambar, Deskripsi } = req.body;
 
-    const checkQuery = "SELECT Gambar FROM Produk WHERE ID = ?";
+    const checkQuery = "SELECT Gambar FROM produk WHERE ID = ?";
 
     db.query(checkQuery, [id], (err, rows) => {
         if (err) {
@@ -350,7 +356,7 @@ app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
             pathGambar = Gambar;
         }
 
-        const updateQuery = 'UPDATE Produk SET Kodeproduk = ?, Namaproduk = ?, Kategori = ?, Harga = ?, Stok = ?, Gambar = ?, Deskripsi = ? WHERE ID = ?';
+        const updateQuery = 'UPDATE produk SET Kodeproduk = ?, Namaproduk = ?, Kategori = ?, Harga = ?, Stok = ?, Gambar = ?, Deskripsi = ? WHERE ID = ?';
 
         db.query(updateQuery, [Kodeproduk, Namaproduk, Kategori, Harga, Stok, pathGambar, Deskripsi, id], (updateErr, result) => {
             if (updateErr) {
@@ -370,7 +376,7 @@ app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
 app.post('/api/keranjang', (req, res) => {
     const { User_ID, Produk_ID } = req.body;
     // query cek stok 
-    const queryCheckStock = "SELECT Stok FROM Produk WHERE ID = ?";
+    const queryCheckStock = "SELECT Stok FROM produk WHERE ID = ?";
     db.query(queryCheckStock, [Produk_ID], (err, productResult) => {
         if (err) return res.status(500).json({ error: err.message });
 
@@ -456,7 +462,7 @@ app.put('/api/keranjang/:id', (req, res) => {
         return res.status(400).json({ message: 'Jumlah Minimal Adalah 1' });
     }
 
-    const queryGetProduct = "SELECT k.Produk_ID, p.Stok FROM keranjang k JOIN Produk p ON k.Produk_ID = p.ID WHERE k.ID = ?";
+    const queryGetProduct = "SELECT k.Produk_ID, p.Stok FROM keranjang k JOIN produk p ON k.Produk_ID = p.ID WHERE k.ID = ?";
     db.query(queryGetProduct, [id], (err, productResult) => {
         if (err) return res.status(500).json({ error: err.message });
         if (productResult.length === 0) return res.status(404).json({ message: "Data keranjang tidak ditemukan" });
@@ -493,7 +499,7 @@ app.post('/api/checkout', async (req, res) => {
         const queryGetCart = `
             SELECT k.Produk_ID, k.Jumlah, p.Harga, p.Stok
             FROM keranjang k 
-            JOIN Produk p ON k.Produk_ID = p.ID
+            JOIN produk p ON k.Produk_ID = p.ID
             WHERE k.User_ID = ?
         `;
         const [cartItems] = await db.promise().query(queryGetCart, [User_ID]);
@@ -524,7 +530,7 @@ app.post('/api/checkout', async (req, res) => {
         await db.promise().query(queryInsertItems, [orderItemsData]);
 
         for (const item of cartItems) {
-            const queryUpdateStock = "UPDATE Produk SET Stok = Stok - ? WHERE ID = ?";
+            const queryUpdateStock = "UPDATE produk SET Stok = Stok - ? WHERE ID = ?";
             await db.promise().query(queryUpdateStock, [item.Jumlah, item.Produk_ID]);
             console.log(`[SUKSES MEMOTONG STOK] Produk ID ${item.Produk_ID} berkurang sebanyak ${item.Jumlah}`);
         }
