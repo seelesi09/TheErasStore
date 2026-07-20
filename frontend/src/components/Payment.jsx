@@ -69,7 +69,7 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
 
         // post ke database lewat endpoint 
         try {
-            const response = await fetch('http://localhost:5000/api/payment/confirm', {
+            const response = await fetch('theerasstore-production.up.railway.app/api/payment/confirm', {
                 method: 'POST',
                 body: formData,
             });
