@@ -53,7 +53,7 @@ export default function AddAlbumForm({ onSuccess }) {
     formData.append("audio", audioFile);
 
     try {
-      const res = await fetch('http://localhost:5000/api/albums', {
+      const res = await fetch('theerasstore-production.up.railway.app/api/albums', {
         method: "POST",
         body: formData,
       });
