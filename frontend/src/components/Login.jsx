@@ -30,7 +30,7 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post('theerasstore-production.up.railway.app/api/login', {
+      const response = await axios.post('https://https://theerasstore-production.up.railway.app/api/login', {
         username: username.trim(),
         password: password.trim()
       });
