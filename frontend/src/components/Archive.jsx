@@ -8,14 +8,14 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
   const [dbAlbums, setDbAlbums] = useState([]);
 
   useEffect(() => {
-    axios.get('theerasstore-production.up.railway.app/api/albums')
+    axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => {
         const formatted = res.data.map((a) => ({
           name: a.name,
           bg: a.bg_color,       // hex string, contoh "#ffedd5"
           text: a.text_color,
           border: a.border_color,
-          audio: `theerasstore-production.up.railway.app${a.audio_url}`,
+          audio: `https://theerasstore-production.up.railway.app${a.audio_url}`,
           isFromDb: true,       // flag buat bedain cara render style-nya
         }));
         setDbAlbums(formatted);
