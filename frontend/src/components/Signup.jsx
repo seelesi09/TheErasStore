@@ -86,7 +86,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('theerasstore-production.up.railway.app/api/signup', {
+            const response = await axios.post('https://https://theerasstore-production.up.railway.app/api/signup', {
                 username: formData.username,
                 password: formData.password,
             });
