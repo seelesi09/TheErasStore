@@ -90,7 +90,7 @@ function App() {
   const inputFileRef = React.useRef(null);
   const [dbAlbums, setDbAlbums] = useState([]);
   useEffect(() => {
-    axios.get('theerasstore-production.up.railway.app/api/albums')
+    axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => setDbAlbums(res.data))
       .catch((err) => console.error('Gagal mengambil album:', err));
   }, []);
@@ -112,7 +112,7 @@ function App() {
 
   const fetchProducts = async () => {
     setLoading(true);
-    axios.get('theerasstore-production.up.railway.app/api/produk')
+    axios.get('https://theerasstore-production.up.railway.app/api/produk')
       .then((res) => {
         setProducts(res.data);
         setLoading(false);
@@ -126,7 +126,7 @@ function App() {
   useEffect(() => {
     const fetchOriginalProducts = async () => {
       try {
-        const response = await axios.get('theerasstore-production.up.railway.app/api/produk');
+        const response = await axios.get('https://theerasstore-production.up.railway.app/api/produk');
         setProducts(response.data);
       } catch (error) {
         console.error("Gagal memuat katalog produk:", error);
@@ -140,7 +140,7 @@ function App() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    axios.post('theerasstore-production.up.railway.app/api/login', { username: formAuth.username, password: formAuth.password })
+    axios.post('https://theerasstore-production.up.railway.app/api/login', { username: formAuth.username, password: formAuth.password })
       .then((res) => {
         alert(res.data.message || 'Login Berhasil!');
         localStorage.setItem('shopey_user', JSON.stringify(res.data.user));
@@ -182,7 +182,7 @@ function App() {
 
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-      axios.put(`theerasstore-production.up.railway.app/api/produk/${editId}`, formData, config)
+      axios.put(`https://theerasstore-production.up.railway.app/api/produk/${editId}`, formData, config)
         .then(() => {
           toast.success('Produk berhasil diupdate!');
           resetFormProduct();
@@ -207,7 +207,7 @@ function App() {
 
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
-      axios.post('theerasstore-production.up.railway.app/api/produk', formData, config)
+      axios.post('https://theerasstore-production.up.railway.app/api/produk', formData, config)
         .then(() => {
           toast.success('Produk berhasil ditambahkan!');
           resetFormProduct();
@@ -249,7 +249,7 @@ function App() {
       cancelButtonText: 'Batal'
     }).then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`theerasstore-production.up.railway.app/api/produk/${id}`)
+        axios.delete(`https://theerasstore-production.up.railway.app/api/produk/${id}`)
           .then(() => {
             toast.success('Produk berhasil dihapus!');
             if (editId === id) resetFormProduct();
@@ -279,7 +279,7 @@ function App() {
       return;
     }
     try {
-      const response = await axios.post('theerasstore-production.up.railway.app/api/keranjang', {
+      const response = await axios.post('https://theerasstore-production.up.railway.app/api/keranjang', {
         User_ID: user.ID,
         Produk_ID: productID
       });
