@@ -49,7 +49,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         setLoading(true);
         try {
             const userId = user.ID || user.id;
-            const response = await axios.get(`http://localhost:5000/api/keranjang/${userId}`);
+            const response = await axios.get(`theerasstore-production.up.railway.app/api/keranjang/${userId}`);
             setCartItems(response.data);
         } catch (error) {
             console.error('Gagal Mengambil Data keranjang: ', error);
@@ -72,7 +72,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         }
 
         try {
-            const response = await axios.delete(`http://localhost:5000/api/keranjang/${keranjangID}`);
+            const response = await axios.delete(`theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`);
             toast.success(response.data.message || 'Product Deleted');
 
             fetchCart();
@@ -92,7 +92,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         }
 
         try {
-            await axios.put(`http://localhost:5000/api/keranjang/${keranjangID}`, {
+            await axios.put(`theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`, {
                 Jumlah: jumlahBaru
             });
             fetchCart();
@@ -136,7 +136,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
                     const userId = user.ID || user.id;
                     const totalHarga = calculateTotal();
 
-                    const response = await axios.post('http://localhost:5000/api/checkout', {
+                    const response = await axios.post('theerasstore-production.up.railway.app/api/checkout', {
                         User_ID: userId,
                         Total_Harga: totalHarga
                     });
