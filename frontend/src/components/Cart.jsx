@@ -49,7 +49,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         setLoading(true);
         try {
             const userId = user.ID || user.id;
-            const response = await axios.get(`https://https://theerasstore-production.up.railway.app/api/keranjang/${userId}`);
+            const response = await axios.get(`https://theerasstore-production.up.railway.app/api/keranjang/${userId}`);
             setCartItems(response.data);
         } catch (error) {
             console.error('Gagal Mengambil Data keranjang: ', error);
