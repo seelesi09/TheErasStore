@@ -4,26 +4,26 @@ import { staticEras } from '../data/staticEras';
 
 const Detail = lazy(() => import('./Detail'));
 
-function Archive({ products, handleRealAddToCart, setCurrentView }) {
+function Archive({ products = [], handleRealAddToCart, setCurrentView }) {
   const [dbAlbums, setDbAlbums] = useState([]);
 
   useEffect(() => {
     axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => {
-        const formatted = res.data.map((a) => ({
+        const albumsData = Array.isArray(res.data) ? res.data : [];
+        const formatted = albumsData.map((a) => ({
           name: a.name,
-          bg: a.bg_color,       // hex string, contoh "#ffedd5"
+          bg: a.bg_color,
           text: a.text_color,
           border: a.border_color,
-          audio: `https://theerasstore-production.up.railway.app${a.audio_url}`,
-          isFromDb: true,       // flag buat bedain cara render style-nya
+          audio: a.audio_url ? `https://theerasstore-production.up.railway.app${a.audio_url}` : '',
+          isFromDb: true,
         }));
         setDbAlbums(formatted);
       })
       .catch((err) => console.error('Gagal mengambil album:', err));
   }, []);
 
-  // Gabungan 13 album lama (Tailwind class) + album baru dari database (hex color)
   const eras = [...staticEras, ...dbAlbums];
 
   const [currentBg, setCurrentBg] = useState("bg-[#f8fafc]");
@@ -88,7 +88,6 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
               const isFromDb = entry.target.getAttribute('data-fromdb') === 'true';
 
               if (eraBg) {
-                // kalau dari database, bg-nya hex color, jangan dipasang ke className
                 setCurrentBg(isFromDb ? { custom: eraBg } : eraBg);
               }
               if (eraAudio) playEraAudio(eraAudio, eraName);
@@ -96,8 +95,9 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
           });
         },
         {
-          threshold: 0.15,
-          rootMargin: "-20% 0px -40% 0px"
+          // PERBAIKAN HP: Threshold diset 0 & margin disesuaikan agar responsif di layar HP
+          threshold: 0,
+          rootMargin: "-10% 0px -20% 0px"
         }
       );
     }
@@ -120,15 +120,22 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
     setIsDetailOpen(true);
   };
 
-  // Deteksi bg gelap, dukung baik Tailwind class (statis) maupun hex (dari db)
   const isDarkBg =
     currentBg === "bg-[#1a1a1a]" ||
     currentBg === "bg-[#0f172a]" ||
-    (typeof currentBg === 'object' && ['#1a1a1a', '#0f172a'].includes(currentBg.custom?.toLowerCase()));
+    (typeof currentBg === 'object' && ['#1a1a1a', '#0f172a', '#000000', '#18181b'].includes(currentBg.custom?.toLowerCase()));
 
-  // Style & className wrapper utama, mendukung dua sumber warna
   const wrapperBgStyle = typeof currentBg === 'object' ? { backgroundColor: currentBg.custom } : {};
   const wrapperBgClass = typeof currentBg === 'string' ? currentBg : '';
+
+  // Helper untuk membersihkan URL Gambar dari localhost ke Railway
+  const formatImageUrl = (gambarRaw) => {
+    if (!gambarRaw || typeof gambarRaw !== 'string') return 'https://via.placeholder.com/300';
+    const firstUrl = gambarRaw.split(',')[0].trim();
+    return firstUrl.replace('http://localhost:5000', 'https://theerasstore-production.up.railway.app');
+  };
+
+  const safeProducts = Array.isArray(products) ? products : [];
 
   return (
     <div
@@ -143,7 +150,7 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
         </div>
         <button
           onClick={togglePlayback}
-          className={`w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md relative overflow-hidden group`}
+          className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-md relative overflow-hidden group"
         >
           <div className={`absolute inset-0.5 rounded-full border border-dashed border-white/30 ${isPlaying ? 'animate-spin [animation-duration:8s]' : ''}`}></div>
           {isPlaying ? (
@@ -177,14 +184,13 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
 
         <div className="space-y-36">
           {eras.map((era) => {
-            const eraProducts = products.filter((p) => {
+            const eraProducts = safeProducts.filter((p) => {
               const kategoriProduk = p.Kategori || p.kategori;
-              return kategoriProduk?.toLowerCase().trim() === era.name.toLowerCase().trim();
+              return kategoriProduk?.toLowerCase().trim() === era.name?.toLowerCase().trim();
             });
 
             if (eraProducts.length === 0) return null;
 
-            // Header judul album: pakai className kalau statis, style kalau dari db
             const titleClassName = era.isFromDb
               ? 'text-3xl md:text-4xl font-normal font-folklore tracking-wide border-b pb-2 inline-block transition-colors duration-500'
               : `text-3xl md:text-4xl font-normal font-folklore tracking-wide border-b border-current pb-2 ${era.text} inline-block transition-colors duration-500`;
@@ -230,11 +236,7 @@ function Archive({ products, handleRealAddToCart, setCurrentView }) {
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10" />
                           <img
                             loading="lazy"
-                            src={
-                              gambarRaw && typeof gambarRaw === 'string'
-                                ? gambarRaw.split(',')[0].trim()
-                                : 'https://via.placeholder.com/300'
-                            }
+                            src={formatImageUrl(gambarRaw)}
                             alt={nama}
                             className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
                           />
