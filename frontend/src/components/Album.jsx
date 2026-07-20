@@ -4,7 +4,7 @@ export default function Album() {
   const [eras, setEras] = useState([]);
 
   useEffect(() => {
-    fetch('https://era-store.up.railway.app/theerasstore-production.up.railway.app/api/albums')
+    fetch('theerasstore-production.up.railway.app/api/albums')
       .then((res) => res.json())
       .then((data) => setEras(data));
   }, []);
