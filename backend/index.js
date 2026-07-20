@@ -109,23 +109,24 @@ db.connect((err) => {
 // Endpoint SignUp
 app.post('/api/signup', (req, res) => {
     const { username, password } = req.body;
-    // jika username / password gak diisi 
+    
+    // 1. Cek input kosong
     if (!username || !password) {
         return res.status(400).json({
             success: false,
             message: 'Username dan Password tidak boleh kosong'
         });
     }
-    // query sql 
+
+    // 2. Query cek username
     const checkUserQuery = 'SELECT * FROM login WHERE Username = ?';
 
-    // cek username apakah sudah terdaftar 
     db.query(checkUserQuery, [username], (err, result) => {
         if (err) {
             console.error('Error saat cek username: ', err);
             return res.status(500).json({ error: 'Terjadi kesalahan sistem' });
         }
-        // jika result lebih dr 0 berarti terdaftar, suruh pke yang lain 
+        
         if (result.length > 0) {
             return res.status(400).json({
                 success: false,
@@ -133,8 +134,7 @@ app.post('/api/signup', (req, res) => {
             });
         }
 
-        // kalo misal username ny gak ada yang pake lanjut ke password 
-        // enkripsi pake bcript
+        // 3. Enkripsi password
         const saltRounds = 10;
         bcrypt.hash(password, saltRounds, (hashErr, hashedPassword) => {
             if (hashErr) {
@@ -142,17 +142,18 @@ app.post('/api/signup', (req, res) => {
                 return res.status(500).json({ error: 'Terjadi kesalahan sistem' });
             }
 
-            // query post ke database (username sama password)
-            const insertQuery = 'INSERT INTO login (Username, Password) VALUES (?, ?)';
+            // 4. Masukkan kolom role dengan nilai 'customer'
+            const insertQuery = 'INSERT INTO login (Username, Password, role) VALUES (?, ?, ?)';
+            const userRole = 'customer'; // Kunci sebagai customer
 
-            // post ke database / sign up 
-            db.query(insertQuery, [username, hashedPassword], (insertErr, insertResult) => {
+            db.query(insertQuery, [username, hashedPassword, userRole], (insertErr, insertResult) => {
                 if (insertErr) {
                     console.error('Error saat register:', insertErr);
                     return res.status(500).json({
                         error: 'Gagal menyimpan data pengguna'
                     });
                 }
+
                 res.status(201).json({
                     success: true,
                     message: 'Registrasi Berhasil, Silahkan Login'
