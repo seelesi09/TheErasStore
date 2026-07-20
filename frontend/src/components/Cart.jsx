@@ -72,7 +72,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         }
 
         try {
-            const response = await axios.delete(`https://https://theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`);
+            const response = await axios.delete(`https://theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`);
             toast.success(response.data.message || 'Product Deleted');
 
             fetchCart();
@@ -92,7 +92,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
         }
 
         try {
-            await axios.put(`https://https://theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`, {
+            await axios.put(`https://theerasstore-production.up.railway.app/api/keranjang/${keranjangID}`, {
                 Jumlah: jumlahBaru
             });
             fetchCart();
@@ -136,7 +136,7 @@ function Cart({ user, setCurrentView, onCheckoutSuccess }) {
                     const userId = user.ID || user.id;
                     const totalHarga = calculateTotal();
 
-                    const response = await axios.post('https://https://theerasstore-production.up.railway.app/api/checkout', {
+                    const response = await axios.post('https://theerasstore-production.up.railway.app/api/checkout', {
                         User_ID: userId,
                         Total_Harga: totalHarga
                     });
