@@ -540,10 +540,9 @@ app.post('/api/checkout', async (req, res) => {
 // Endpoint get history order
 app.get('/api/orders/:userId', (req, res) => {
     const { userId } = req.params;
-
     const query = `
         SELECT 
-            o.ID AS Order_ID, o.Total_Harga, o.Tanggal_Order, o.Status,
+            o.ID AS Order_ID, o.Total_Harga, o.Tanggal_Order, o.Status, o.Alamat,
             oi.Jumlah, oi.Harga_Beli,
             p.Namaproduk, p.Gambar
         FROM orders o
@@ -552,10 +551,8 @@ app.get('/api/orders/:userId', (req, res) => {
         WHERE o.User_ID = ?
         ORDER BY o.Tanggal_Order DESC
     `;
-
     db.query(query, [userId], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
-
         const formattedOrders = results.reduce((acc, current) => {
             const foundOrder = acc.find(item => item.Order_ID === current.Order_ID);
             const itemDetails = {
@@ -564,7 +561,6 @@ app.get('/api/orders/:userId', (req, res) => {
                 Jumlah: current.Jumlah,
                 Harga_Beli: current.Harga_Beli
             };
-
             if (foundOrder) {
                 foundOrder.Items.push(itemDetails);
             } else {
@@ -573,12 +569,12 @@ app.get('/api/orders/:userId', (req, res) => {
                     Total_Harga: current.Total_Harga,
                     Tanggal_Order: current.Tanggal_Order,
                     Status: current.Status,
+                    Alamat: current.Alamat,
                     Items: [itemDetails]
                 });
             }
             return acc;
         }, []);
-
         return res.json(formattedOrders);
     });
 });
