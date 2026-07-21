@@ -52,7 +52,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
 
         // Ambil error hasil validasi
         const validationErrors = validateForm();
-        
+
         if (Object.keys(validationErrors).length > 0) {
             const firstError = Object.values(validationErrors)[0];
             Swal.fire({
@@ -142,11 +142,10 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                                 value={formData.username}
                                 onChange={handleInputChange}
                                 placeholder="Choose your username"
-                                className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${
-                                    errors.username
-                                        ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
-                                        : 'border-white/10 focus:border-white/20 focus:bg-white/10'
-                                }`}
+                                className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${errors.username
+                                    ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
+                                    : 'border-white/10 focus:border-white/20 focus:bg-white/10'
+                                    }`}
                                 disabled={isLoading}
                             />
                             {errors.username && (
@@ -156,53 +155,48 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
 
                         {/* Password Input dengan Toggle Show/Hide */}
                         <div>
-    <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-        Password
-    </label>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                                Password
+                            </label>
 
-    {/* Container relative */}
-    <div className="relative">
-        <input
-            type={showPassword ? 'text' : 'password'}
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="6 characters minimum"
-            /* Pastikan ada pr-10 atau pr-12 agar teks password tidak menumpuk ikon */
-            className={`w-full px-4 py-3 pr-12 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${
-                errors.password
-                    ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
-                    : 'border-white/10 focus:border-white/20 focus:bg-white/10'
-            }`}
-            disabled={isLoading}
-        />
+                            {/* Container relative */}
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="6 characters minimum"
+                                    /* Pastikan ada pr-10 atau pr-12 agar teks password tidak menumpuk ikon */
+                                    className={`w-full px-4 py-3 pr-12 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${errors.password
+                                            ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
+                                            : 'border-white/10 focus:border-white/20 focus:bg-white/10'
+                                        }`}
+                                    disabled={isLoading}
+                                />
 
-        {/* Tombol Mata - inset-y-0 + flex items-center membuat ikon presisi di tengah vertikal */}
-        <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 inset-y-0 flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none"
-        >
-            {showPassword ? (
-                /* SVG Mata Dicoret */
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                </svg>
-            ) : (
-                /* SVG Mata Terbuka */
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12c1.07-4.516 5.183-8 10.016-8 4.832 0 8.946 3.484 10.017 8-1.07 4.516-5.183 8-10.017 8-4.832 0-8.946-3.484-10.017-8z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            )}
-        </button>
-    </div>
+                                {/* Tombol Mata - inset-y-0 + flex items-center membuat ikon presisi di tengah vertikal */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 inset-y-0 flex items-center text-gray-400 hover:text-white transition-colors focus:outline-none"
+                                >
+                                    {showPassword ? (
+                                        /* SVG Mata Dicoret */
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                        </svg>
+                                    ) : (
+                                        /* SVG Mata Terbuka */
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12c1.07-4.516 5.183-8 10.016-8 4.832 0 8.946 3.484 10.017 8-1.07 4.516-5.183 8-10.017 8-4.832 0-8.946-3.484-10.017-8z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
 
-    {errors.password && (
-        <p className="mt-1 text-xs text-red-400">{errors.password}</p>
-    )}
-</div>
                             {errors.password && (
                                 <p className="mt-1 text-xs text-red-400">{errors.password}</p>
                             )}
