@@ -47,6 +47,7 @@ function AdminOrders() {
                             <th className="p-4">Order ID</th>
                             <th className="p-4">Customer</th>
                             <th className="p-4">Date Placed</th>
+                            <th className="p-4">Shipping Address</th>
                             <th className="p-4">Total Price</th>
                             <th className="p-4">Status</th>
                             <th className="p-4 text-center">Receipt</th>
@@ -72,6 +73,12 @@ function AdminOrders() {
                                         month: 'short',
                                         year: 'numeric'
                                     })}
+                                </td>
+
+                                <td className="py-4 px-6 text-slate-600 max-w-[220px]">
+                                    <span className="line-clamp-2" title={order.Alamat}>
+                                        {order.Alamat || '-'}
+                                    </span>
                                 </td>
 
                                 <td className="py-4 px-6 font-bold text-slate-800">
