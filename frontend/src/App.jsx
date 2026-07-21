@@ -456,13 +456,13 @@ function App() {
       )}
 
       {/* ========== ARCHIVE VIEW ========== */}
-      {currentView === 'archive' && (
-        <Archive
-          products={products}
-          handleRealAddToCart={handleRealAddToCart}
-          setCurrentView={setCurrentView}
-        />
-      )}
+      {currentView === 'archive' && authView === null && (
+  <Archive
+    products={products}
+    handleRealAddToCart={handleRealAddToCart}
+    setCurrentView={setCurrentView}
+  />
+)}
 
       {/* ========== ALBUM VIEW (BARU) ==========
           Ditaruh sejajar dengan view lain (cart, archive, history, dst),
