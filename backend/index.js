@@ -624,6 +624,7 @@ app.get('/api/admin/orders', (req, res) => {
     o.Tanggal_Order, 
     o.Status, 
     o.Bukti_Bayar,
+    o.Alamat,
     l.Username AS Nama_Customer 
 FROM orders o
 JOIN login l ON o.User_ID = l.ID
