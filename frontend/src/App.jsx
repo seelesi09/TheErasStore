@@ -89,9 +89,11 @@ function App() {
   const [selectedProductToEdit, setSelectedProductToEdit] = useState(null);
   const inputFileRef = React.useRef(null);
   const [dbAlbums, setDbAlbums] = useState([]);
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [currentView]);
+ useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}, [currentView]);
   useEffect(() => {
     axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => setDbAlbums(res.data))
