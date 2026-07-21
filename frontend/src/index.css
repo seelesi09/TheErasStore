@@ -32,3 +32,6 @@ body::-webkit-scrollbar {
 .swal2-title {
   font-family: 'Folklore', sans-serif !important;
 }
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, [currentView]);
