@@ -90,6 +90,9 @@ function App() {
   const inputFileRef = React.useRef(null);
   const [dbAlbums, setDbAlbums] = useState([]);
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentView]);
+  useEffect(() => {
     axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => setDbAlbums(res.data))
       .catch((err) => console.error('Gagal mengambil album:', err));
