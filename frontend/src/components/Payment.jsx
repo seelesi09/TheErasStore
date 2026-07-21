@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [alamat, setAlamat] = useState(''); // 1. State baru untuk Alamat
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -14,6 +15,7 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
             setPreview(URL.createObjectURL(file));
         }
     };
+
     const toast = {
         success: (message) => {
             Swal.fire({
@@ -50,10 +52,17 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
             });
         }
     };
-    // fungsi submit 
+
+    // Fungsi submit 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        //gd bukti transfer dibanned 
+
+        // 2. Validasi input alamat
+        if (!alamat.trim()) {
+            toast.error("Silakan isi alamat pengiriman terlebih dahulu!");
+            return;
+        }
+
         if (!image) {
             toast.error("Silakan pilih foto bukti transfer terlebih dahulu!");
             return;
@@ -62,12 +71,13 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
         setLoading(true);
         setMessage('');
 
-        // buat variabel form data buat di post ke database 
+        // 3. Masukkan Alamat ke FormData
         const formData = new FormData();
         formData.append('Order_ID', Order_ID);
+        formData.append('Alamat', alamat); // <-- Ditambahkan di sini
         formData.append('image', image);
 
-        // post ke database lewat endpoint 
+        // Post ke database lewat endpoint 
         try {
             const response = await fetch('https://theerasstore-production.up.railway.app/api/payment/confirm', {
                 method: 'POST',
@@ -90,13 +100,11 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
         }
     };
 
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 py-16 px-6 md:px-12 lg:px-24">
             <div className="max-w-xl mx-auto">
-                {/* Button back to shop  */}
+                {/* Button back to shop */}
                 <button
-                    // jika di klik balik ke currentview pembeli / halaman utama 
                     onClick={() => setCurrentView('pembeli')}
                     className="mb-8 flex items-center gap-2 text-sm font-folklore font-bold text-slate-600 hover:text-black transition-colors"
                 >
@@ -109,6 +117,7 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
                         Your payment progress will be saved at history page
                     </p>
                 </h2>
+
                 <div className="bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden mb-6">
                     <div className="grid grid-cols-3 gap-4 bg-slate-50 p-4 border-b border-slate-200 text-xs md:text-sm font-folklore">
                         <div>
@@ -145,6 +154,23 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
 
                     <div className="p-6 bg-white">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* 4. Input Textarea Alamat Lengkap */}
+                            <div className="font-folklore">
+                                <label className="block text-sm font-bold text-slate-800 mb-2">
+                                    Shipping Address (Alamat Lengkap)
+                                </label>
+                                <textarea
+                                    value={alamat}
+                                    onChange={(e) => setAlamat(e.target.value)}
+                                    placeholder="Masukkan alamat lengkap pengiriman (Jalan, No. Rumah, RT/RW, Kecamatan, Kota)..."
+                                    rows="3"
+                                    className="block w-full text-xs text-slate-700 p-3 border border-slate-300 rounded-sm focus:outline-none focus:border-black bg-slate-50/50 resize-none"
+                                    required
+                                />
+                            </div>
+
+                            {/* Input File Bukti Transfer */}
                             <div className="font-folklore">
                                 <label className="block text-sm font-bold text-slate-800 mb-2">
                                     Upload Your Proof of Transfer
@@ -174,8 +200,7 @@ const Payment = ({ Order_ID, Total_Harga, setCurrentView }) => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`w-full bg-[#1a1a1a] hover:bg-black text-white font-folklore font-semibold py-3 rounded-sm transition-all shadow-md ${loading ? 'opacity-60 cursor-not-allowed' : ''
-                                    }`}
+                                className={`w-full bg-[#1a1a1a] hover:bg-black text-white font-folklore font-semibold py-3 rounded-sm transition-all shadow-md ${loading ? 'opacity-60 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? "Processing Payment..." : "Confirm Payment"}
                             </button>
