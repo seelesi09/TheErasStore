@@ -80,23 +80,26 @@ function Archive({ products = [], handleRealAddToCart, setCurrentView }) {
     if (!observerRef.current) {
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const eraBg = entry.target.getAttribute('data-bg');
-              const eraAudio = entry.target.getAttribute('data-audio');
-              const eraName = entry.target.getAttribute('data-name');
-              const isFromDb = entry.target.getAttribute('data-fromdb') === 'true';
+          const visibleEntries = entries.filter((entry) => entry.isIntersecting);
 
-              if (eraBg) {
-                setCurrentBg(isFromDb ? { custom: eraBg } : eraBg);
-              }
-              if (eraAudio) playEraAudio(eraAudio, eraName);
-            }
+          if (visibleEntries.length === 0) return;
+
+          const mostVisible = visibleEntries.reduce((prev, current) => {
+            return current.intersectionRatio > prev.intersectionRatio ? current : prev;
           });
+
+          const eraBg = mostVisible.target.getAttribute('data-bg');
+          const eraAudio = mostVisible.target.getAttribute('data-audio');
+          const eraName = mostVisible.target.getAttribute('data-name');
+          const isFromDb = mostVisible.target.getAttribute('data-fromdb') === 'true';
+
+          if (eraBg) {
+            setCurrentBg(isFromDb ? { custom: eraBg } : eraBg);
+          }
+          if (eraAudio) playEraAudio(eraAudio, eraName);
         },
         {
-          // PERBAIKAN HP: Threshold diset 0 & margin disesuaikan agar responsif di layar HP
-          threshold: 0,
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
           rootMargin: "-10% 0px -20% 0px"
         }
       );
@@ -252,11 +255,10 @@ function Archive({ products = [], handleRealAddToCart, setCurrentView }) {
 
                           <button
                             onClick={() => handleRealAddToCart(product.ID || product.id)}
-                            className={`w-full mt-4 bg-transparent border text-xs tracking-widest font-semibold py-2.5 rounded-sm transition-all duration-300 ${
-                              isDarkBg
+                            className={`w-full mt-4 bg-transparent border text-xs tracking-widest font-semibold py-2.5 rounded-sm transition-all duration-300 ${isDarkBg
                                 ? 'border-white/20 text-white hover:bg-white hover:text-black'
                                 : 'border-black/20 text-black hover:bg-black hover:text-white'
-                            }`}
+                              }`}
                           >
                             ADD TO CART
                           </button>
