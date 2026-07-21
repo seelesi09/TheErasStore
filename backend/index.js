@@ -109,7 +109,7 @@ db.connect((err) => {
 // Endpoint SignUp
 app.post('/api/signup', (req, res) => {
     const { username, password } = req.body;
-    
+
     // 1. Cek input kosong
     if (!username || !password) {
         return res.status(400).json({
@@ -126,7 +126,7 @@ app.post('/api/signup', (req, res) => {
             console.error('Error saat cek username: ', err);
             return res.status(500).json({ error: 'Terjadi kesalahan sistem' });
         }
-        
+
         if (result.length > 0) {
             return res.status(400).json({
                 success: false,
@@ -265,16 +265,6 @@ app.delete('/api/albums/:id', (req, res) => {
     });
 });
 
-// ============================================================
-// PRODUK
-// (Catatan: nama tabel di database ternyata lowercase semua ->
-// "produk", bukan "Produk". Semua query di bawah sudah disamakan
-// ke lowercase supaya konsisten dan tidak error
-// "Table ... doesn't exist" di MySQL Linux yang case-sensitive.
-// Nama KOLOM tetap dibiarkan sesuai aslinya, misal Kodeproduk,
-// Namaproduk, Harga, dst — yang diganti cuma nama TABEL-nya.)
-// ============================================================
-
 // Endpoint Get All Produk
 app.get('/api/produk', (req, res) => {
     db.query('SELECT * FROM produk', (err, result) => {
@@ -296,7 +286,7 @@ app.post('/api/produk', upload.array('image', 10), (req, res) => {
 
     let pathGambar = null;
     if (req.files && req.files.length > 0) {
-        pathGambar = req.files.map(file => `http://localhost:5000/uploads/${file.filename}`).join(',');
+        pathGambar = req.files.map(file => `https://theerasstore-production.up.railway.app/uploads/${file.filename}`).join(',');
     } else if (Gambar) {
         pathGambar = Gambar;
     }
@@ -351,7 +341,7 @@ app.put('/api/produk/:id', upload.array('image', 5), (req, res) => {
         let pathGambar = rows[0].Gambar;
 
         if (req.files && req.files.length > 0) {
-            pathGambar = req.files.map(file => `http://localhost:5000/uploads/${file.filename}`).join(',');
+            pathGambar = req.files.map(file => `https://theerasstore-production.up.railway.app/uploads/${file.filename}`).join(',');
         }
         else if (Gambar) {
             pathGambar = Gambar;
@@ -595,17 +585,19 @@ app.get('/api/orders/:userId', (req, res) => {
 
 // Endpoint Konfirmasi Pembayaran
 app.post('/api/payment/confirm', upload.single('image'), (req, res) => {
-    const { Order_ID } = req.body;
+    const { Order_ID, Alamat } = req.body;
 
-    if (!Order_ID || !req.file) {
-        return res.status(400).json({ message: "Order ID dan foto bukti transfer wajib diisi/diunggah!" });
+    if (!Order_ID || !req.file || !Alamat) {
+        return res.status(400).json({
+            message: "Order ID, Alamat pengiriman, dan foto bukti transfer wajib diisi!"
+        });
     }
 
-    const pathBukti = `http://localhost:5000/uploads/${req.file.filename}`;
+    const pathBukti = `https://theerasstore-production.up.railway.app/uploads/${req.file.filename}`;
 
-    const queryUpdateOrder = "UPDATE orders SET Status = 'Success', Bukti_Bayar = ? WHERE ID = ?";
+    const queryUpdateOrder = "UPDATE orders SET Status = 'Success', Bukti_Bayar = ?, Alamat = ? WHERE ID = ?";
 
-    db.query(queryUpdateOrder, [pathBukti, Order_ID], (err, result) => {
+    db.query(queryUpdateOrder, [pathBukti, Alamat, Order_ID], (err, result) => {
         if (err) {
             console.error("Error saat konfirmasi pembayaran:", err.message);
             return res.status(500).json({ error: err.message });
@@ -617,7 +609,7 @@ app.post('/api/payment/confirm', upload.single('image'), (req, res) => {
 
         return res.json({
             success: true,
-            message: "Payment Has Been Confirmed, Status updated to Success!",
+            message: "Pembayaran dikonfirmasi dan alamat berhasil disimpan!",
             bukti_url: pathBukti
         });
     });
@@ -649,5 +641,5 @@ ORDER BY o.Tanggal_Order DESC;
 
 const PORT = 5000;
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
+    console.log(`Server berjalan di https://theerasstore-production.up.railway.app:${PORT}`);
 });
