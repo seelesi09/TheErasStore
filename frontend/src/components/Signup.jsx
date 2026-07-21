@@ -3,7 +3,6 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
-    // bikin variabel buat nyimpen usn pw 
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -11,28 +10,26 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false); // Perbaikan penamaan setter
 
+    // Validasi form sekarang mengembalikan object error langsung
     const validateForm = () => {
         const newErrors = {};
 
-        // Validasi username harus diizi
         if (!formData.username.trim()) {
             newErrors.username = 'Username must be filled.';
-        // kl misal usernem ngisi kurg 3 karakter bakal dibanned
         } else if (formData.username.length < 3) {
             newErrors.username = 'Username must be at least 3 characters.';
         }
 
-        // pw harus diizi dong masa kosong
         if (!formData.password.trim()) {
-            newErrors.password = 'Password must be filled';
-        // kl misal ngisi pw kurang dr 6 dibanned 
+            newErrors.password = 'Password must be filled.';
         } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+            newErrors.password = 'Password must be at least 6 characters.';
         }
 
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        return newErrors;
     };
 
     const handleInputChange = (e) => {
@@ -50,29 +47,18 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
         }
     };
 
-
     const handleSignup = async (e) => {
         e.preventDefault();
 
-        // Validasi form
-        if (!validateForm()) {
-            const firstError = Object.values(errors)[0];
+        // Ambil error hasil validasi
+        const validationErrors = validateForm();
+        
+        if (Object.keys(validationErrors).length > 0) {
+            const firstError = Object.values(validationErrors)[0];
             Swal.fire({
                 icon: 'warning',
-                title: "Input Doesn't Valid",
+                title: 'Invalid Input',
                 text: firstError,
-                background: '#0d0d0d',
-                color: '#fff',
-                confirmButtonColor: '#6366f1',
-                scrollbarPadding: false,
-                heightAuto: false,
-            });
-            return;
-        } if (formData.password.length < 6) {
-            Swal.fire({
-                title: "Password Too Short",
-                text: "For Safety, Please Make a Password of Minimum 6 Characters",
-                icon: 'warning',
                 background: '#0d0d0d',
                 color: '#fff',
                 confirmButtonColor: '#6366f1',
@@ -80,7 +66,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 heightAuto: false,
                 customClass: { popup: 'rounded-2xl border border-white/5' }
             });
-            return; 
+            return;
         }
 
         setIsLoading(true);
@@ -91,18 +77,16 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 password: formData.password,
             });
 
-            // Signup berhasil
             Swal.fire({
                 icon: 'success',
-                title: 'Account Succesfully Made!',
-                text: 'Congratulation Your Account Have Been Signed up!, Please Login',
+                title: 'Account Successfully Created!',
+                text: 'Congratulations, your account has been registered! Please login.',
                 background: '#0d0d0d',
                 color: '#fff',
                 confirmButtonColor: '#6366f1',
                 scrollbarPadding: false,
                 heightAuto: false,
             }).then(() => {
-                // Reset form
                 setFormData({
                     username: '',
                     password: '',
@@ -113,9 +97,8 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                 }
             });
         } catch (error) {
-
             const errorMessage =
-                error.response?.data?.message || error.message || 'Terjadi kesalahan saat mendaftar';
+                error.response?.data?.message || error.message || 'An error occurred during signup';
 
             Swal.fire({
                 icon: 'error',
@@ -142,7 +125,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                     {/* Header */}
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-white mb-2">Signup</h1>
-                        <p className="text-gray-400 text-sm">Make New Account to Continue</p>
+                        <p className="text-gray-400 text-sm">Create a new account to continue</p>
                     </div>
 
                     {/* Form */}
@@ -158,11 +141,12 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                                 name="username"
                                 value={formData.username}
                                 onChange={handleInputChange}
-                                placeholder="Choose Your Username"
-                                className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${errors.username
+                                placeholder="Choose your username"
+                                className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${
+                                    errors.username
                                         ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
                                         : 'border-white/10 focus:border-white/20 focus:bg-white/10'
-                                    }`}
+                                }`}
                                 disabled={isLoading}
                             />
                             {errors.username && (
@@ -170,25 +154,34 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                             )}
                         </div>
 
-
-                        {/* Password Input */}
+                        {/* Password Input dengan Toggle Show/Hide */}
                         <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                                 Password
                             </label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                placeholder="6 Characters Minimum"
-                                className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 ${errors.password
-                                        ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
-                                        : 'border-white/10 focus:border-white/20 focus:bg-white/10'
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? 'text' : 'password'}
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder="6 characters minimum"
+                                    className={`w-full px-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-200 pr-12 ${
+                                        errors.password
+                                            ? 'border-red-500/50 bg-red-500/10 focus:border-red-500/70'
+                                            : 'border-white/10 focus:border-white/20 focus:bg-white/10'
                                     }`}
-                                disabled={isLoading}
-                            />
+                                    disabled={isLoading}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white text-xs transition-colors"
+                                >
+                                    {showPassword ? 'Hide' : 'Show'}
+                                </button>
+                            </div>
                             {errors.password && (
                                 <p className="mt-1 text-xs text-red-400">{errors.password}</p>
                             )}
@@ -222,7 +215,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         />
                                     </svg>
-                                    Signing Up
+                                    Signing Up...
                                 </>
                             ) : (
                                 'Signup'
@@ -236,14 +229,14 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                             <div className="w-full border-t border-white/10" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-black/40 text-gray-500">Or</span>
+                            <span className="px-2 bg-[#0d0d0d] text-gray-500">Or</span>
                         </div>
                     </div>
 
                     {/* Login Link */}
                     <div className="text-center">
                         <p className="text-gray-400 text-sm">
-                            Already Had an Account?{' '}
+                            Already have an account?{' '}
                             <button
                                 type="button"
                                 onClick={onSwitchToLogin}
