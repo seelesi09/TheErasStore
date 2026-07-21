@@ -62,23 +62,33 @@ function OrderHistory({ user, setCurrentView, setOrderInput }) {
                             return (
                                 <div key={order.Order_ID} className="bg-white border border-slate-200 rounded-sm shadow-sm overflow-hidden">
                                     <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 text-xs font-folklore">
-                                        <div>
-                                            <p className="text-slate-400">ORDER PLACED</p>
-                                            <p className="font-bold text-slate-700">
-                                                {new Date(order.Tanggal_Order).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p className="text-slate-400">TOTAL PRICE</p>
-                                            <p className="font-bold text-slate-900 text-sm">
-                                                Rp {Number(order.Total_Harga).toLocaleString('id-ID')}
-                                            </p>
+                                        <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 text-xs font-folklore">
+                                            <div>
+                                                <p className="text-slate-400">ORDER PLACED</p>
+                                                <p className="font-bold text-slate-700">
+                                                    {new Date(order.Tanggal_Order).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                </p>
+                                            </div>
+
+                                            {/* TAMBAHAN: Alamat pengiriman */}
+                                            <div>
+                                                <p className="text-slate-400">SHIPPING ADDRESS</p>
+                                                <p className="font-bold text-slate-700 max-w-[200px] truncate" title={order.Alamat}>
+                                                    {order.Alamat || '-'}
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p className="text-slate-400">TOTAL PRICE</p>
+                                                {/* ... sisanya sama */}
+                                            </div>
+                                            {/* ... */}
                                         </div>
                                         <div>
                                             <p className="text-slate-400 mb-0.5">STATUS</p>
                                             <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider ${isPending
-                                                    ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                                    : 'bg-green-100 text-green-800 border border-green-200'
+                                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                                : 'bg-green-100 text-green-800 border border-green-200'
                                                 }`}>
                                                 {order.Status}
                                             </span>
