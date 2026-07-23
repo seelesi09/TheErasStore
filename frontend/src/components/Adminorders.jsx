@@ -62,14 +62,14 @@ function AdminOrders() {
             <h2 className="text-2xl font-bold font-folklore text-slate-800 mb-2">
                 Customer Payments Dashboard
             </h2>
-            <p className="text-sm font-folklore text-slate-500 mb-8">
+            <p className="text-1xl font-folklore text-slate-500 mb-8">
                 Pantau riwayat checkout, nominal transfer, beserta bukti pembayaran customer.
             </p>
 
             <div className="overflow-x-auto border border-slate-200 rounded-sm shadow-sm">
                 <table className="w-full min-w-[800px] text-left border-collapse font-folklore text-sm">
                     <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <tr className="bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-500 uppercase tracking-wider">
                             <th className="p-4">Order ID</th>
                             <th className="p-4">Customer</th>
                             <th className="p-4">Date Placed</th>
