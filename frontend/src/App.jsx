@@ -450,7 +450,7 @@ function App() {
 
       {/* ========== CART VIEW ========== */}
       {currentView === 'cart' && (
-        user?.Role === 'admin' ? (
+        user?.Role !== 'admin' ? (
           <div className="text-center py-20 font-folklore text-slate-500">
             Admin tidak memiliki akses ke halaman keranjang/checkout.
           </div>
