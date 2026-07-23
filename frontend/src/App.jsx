@@ -144,7 +144,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (currentView === 'cart' && user?.Role === 'admin') {
+    if (currentView === 'cart' && user?.role === 'admin') {
       toast.error('Admins doesn\'t have access to this page.');
     };
   }, [currentView, user])
@@ -276,7 +276,7 @@ function App() {
     localStorage.setItem('shopey_user', JSON.stringify(userData));
     setAuthView(null);
 
-    if (userData?.Role === 'admin') {
+    if (userData?.role === 'admin') {
       setCurrentView('admin');
     } else {
       setCurrentView('pembeli');
@@ -289,7 +289,7 @@ function App() {
       setAuthView('login');
       return;
     }
-    if (user.Role === 'admin') {
+    if (user.role === 'admin') {
       toast.error('Admin(s) are restricted to checkout product(s)')
       return;
     }
@@ -409,7 +409,7 @@ function App() {
                               namaProduk={product.Namaproduk}
                             />
                           </div>
-                          {user?.Role !== 'admin' && (
+                          {user?.role !== 'admin' && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -450,7 +450,7 @@ function App() {
 
       {/* ========== CART VIEW ========== */}
       {currentView === 'cart' && (
-        user?.Role !== 'admin' ? (
+        user?.role === 'admin' ? (
           <div className="text-center py-20 font-folklore text-slate-500">
             Admin tidak memiliki akses ke halaman keranjang/checkout.
           </div>
