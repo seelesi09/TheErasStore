@@ -143,6 +143,12 @@ function App() {
     fetchOriginalProducts();
   }, []);
 
+  useEffect(() => {
+    if (currentView === 'cart' && user?.Role === 'admin') {
+      toast.error('Admins doesn\'t have access to this page.');
+    };
+  }, [currentView, user])
+
   const handleLogin = (e) => {
     e.preventDefault();
     axios.post('https://theerasstore-production.up.railway.app/api/login', { username: formAuth.username, password: formAuth.password })
@@ -283,6 +289,10 @@ function App() {
       setAuthView('login');
       return;
     }
+    if (user.Role === 'admin'){
+      toast.error('Admin(s) are restricted to checkout product(s)')
+      return;
+    }
     try {
       const response = await axios.post('https://theerasstore-production.up.railway.app/api/keranjang', {
         User_ID: user.ID,
@@ -399,7 +409,7 @@ function App() {
                               namaProduk={product.Namaproduk}
                             />
                           </div>
-
+                        {user?.Role !== 'admin' && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -409,6 +419,7 @@ function App() {
                           >
                             Add To Cart
                           </button>
+                        )}
                         </div>
 
                         <div className="mt-3 sm:mt-4 md:mt-6 px-1">
@@ -439,11 +450,13 @@ function App() {
 
       {/* ========== CART VIEW ========== */}
       {currentView === 'cart' && (
+        user?.Role === 'admin' (
         <Cart
           user={user}
           setCurrentView={setCurrentView}
           onCheckoutSuccess={handleGoToPayment}
         />
+        )
       )}
 
       {/* ========== PAYMENT VIEW ========== */}
