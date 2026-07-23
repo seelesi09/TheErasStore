@@ -67,7 +67,7 @@ function AdminOrders() {
             </p>
 
             <div className="overflow-x-auto border border-slate-200 rounded-sm shadow-sm">
-                <table className="w-full text-left border-collapse font-folklore text-sm">
+                <table className="w-full min-w-[800px] text-left border-collapse font-folklore text-sm">
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                             <th className="p-4">Order ID</th>
