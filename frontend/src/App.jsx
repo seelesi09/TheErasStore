@@ -89,11 +89,11 @@ function App() {
   const [selectedProductToEdit, setSelectedProductToEdit] = useState(null);
   const inputFileRef = React.useRef(null);
   const [dbAlbums, setDbAlbums] = useState([]);
- useEffect(() => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
-}, [currentView]);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [currentView]);
   useEffect(() => {
     axios.get('https://theerasstore-production.up.railway.app/api/albums')
       .then((res) => setDbAlbums(res.data))
@@ -457,12 +457,12 @@ function App() {
 
       {/* ========== ARCHIVE VIEW ========== */}
       {currentView === 'archive' && authView === null && (
-  <Archive
-    products={products}
-    handleRealAddToCart={handleRealAddToCart}
-    setCurrentView={setCurrentView}
-  />
-)}
+        <Archive
+          products={products}
+          handleRealAddToCart={handleRealAddToCart}
+          setCurrentView={setCurrentView}
+        />
+      )}
 
       {/* ========== ALBUM VIEW (BARU) ==========
           Ditaruh sejajar dengan view lain (cart, archive, history, dst),
@@ -599,15 +599,50 @@ function App() {
                       required
                     />
                   </div>
+
+                  {/* Upload Picture - dengan preview */}
                   <div>
                     <label className="text-xs font-semibold text-[#1a1a1a]">Upload Picture</label>
                     <input
                       type="file"
                       multiple
+                      accept="image/*"
                       ref={inputFileRef}
                       onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
                       className="w-full text-xs mt-1 file:mr-2 sm:file:mr-4 file:py-2 file:px-3 sm:file:px-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1a1a1a] file:text-[#b2b2b2] hover:file:bg-[#000000] file:transition-colors file:cursor-pointer text-[#1a1a1a]"
                     />
+
+                    {/* Preview Gambar yang Dipilih */}
+                    {selectedFiles.length > 0 ? (
+                      <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        {selectedFiles.map((file, idx) => (
+                          <div
+                            key={idx}
+                            className="relative aspect-square bg-white rounded-lg sm:rounded-xl overflow-hidden border border-[#545454]/30 shadow-sm group"
+                          >
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`preview-${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
+                              }}
+                              className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-black/60 hover:bg-black/90 text-white text-xs rounded-full transition-colors opacity-0 group-hover:opacity-100"
+                              aria-label="Remove image"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[10px] sm:text-xs text-[#545454] mt-1.5">
+                        Belum ada gambar dipilih. Bisa pilih lebih dari 1 file sekaligus.
+                      </p>
+                    )}
                   </div>
 
                   <button
