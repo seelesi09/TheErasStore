@@ -645,7 +645,7 @@ app.get('/api/admin/orders/:orderId/detail', (req, res) => {
             oi.ID AS Item_ID,
             oi.Produk_ID,
             oi.Jumlah AS Qty,
-            oi.Harga,
+            oi.Harga_Beli,
             p.Namaproduk,
             p.Gambar
         FROM order_items oi
