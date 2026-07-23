@@ -487,76 +487,82 @@ function App() {
 
       {/* ========== ADMIN PANEL ========== */}
       {currentView === 'admin' && (
-        <section className="w-full max-w-[1600px] mx-auto py-6 sm:py-8 md:py-10 lg:py-12 px-4 sm:px-6 md:px-8 lg:px-12 bg-[#b2b2b2]/10 rounded-2xl sm:rounded-3xl space-y-6 sm:space-y-8">
+        <section className="w-full max-w-7xl mx-auto py-8 md:py-10 px-6 md:px-10 bg-white min-h-screen font-folklore">
 
-          {/* Admin Tabs - Responsive */}
-          <div className="flex border-b border-slate-300 font-folklore text-xs sm:text-sm gap-3 sm:gap-6 pb-2 overflow-x-auto">
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">
+            Admin Dashboard
+          </h2>
+          <p className="text-sm text-slate-500 mb-8">
+            Kelola produk, album, dan pantau pembayaran customer.
+          </p>
+
+          {/* Admin Tabs */}
+          <div className="flex border-b border-slate-200 text-sm gap-6 mb-8 overflow-x-auto">
             <button
               onClick={() => setAdminTab('products')}
-              className={`pb-2 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'products'
-                ? 'text-black border-b-2 border-black'
-                : 'text-slate-400 hover:text-slate-700'
+              className={`pb-3 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'products'
+                ? 'text-slate-800 border-b-2 border-slate-800'
+                : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
               Manage Products
             </button>
             <button
               onClick={() => setAdminTab('payments')}
-              className={`pb-2 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'payments'
-                ? 'text-black border-b-2 border-black'
-                : 'text-slate-400 hover:text-slate-700'
+              className={`pb-3 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'payments'
+                ? 'text-slate-800 border-b-2 border-slate-800'
+                : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
               Customer Payments
             </button>
-            {/* Tab baru: Manage Albums */}
             <button
               onClick={() => setAdminTab('albums')}
-              className={`pb-2 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'albums'
-                ? 'text-black border-b-2 border-black'
-                : 'text-slate-400 hover:text-slate-700'
+              className={`pb-3 font-bold tracking-wide transition-all whitespace-nowrap flex-shrink-0 ${adminTab === 'albums'
+                ? 'text-slate-800 border-b-2 border-slate-800'
+                : 'text-slate-400 hover:text-slate-600'
                 }`}
             >
               Manage Albums
             </button>
           </div>
 
-          {/* Products Tab - Responsive Grid */}
+          {/* Products Tab */}
           {adminTab === 'products' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 items-start w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 items-start w-full">
 
               {/* Add Product Form */}
-              <div className="bg-[#b2b2b2] p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border border-[#545454]/30 shadow-md space-y-4 sm:space-y-5 w-full">
-                <h3 className="text-base sm:text-lg font-bold text-[#000000] font-folklore">Add New Product</h3>
-                <form onSubmit={handleSaveProduct} className="space-y-3 sm:space-y-4">
+              <div className="bg-white p-6 rounded-sm border border-slate-200 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-slate-800">Add New Product</h3>
+                <form onSubmit={handleSaveProduct} className="space-y-4">
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Product Code</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Product Code</label>
                     <input
                       type="text"
                       placeholder="P001"
                       value={formProduct.Kodeproduk}
                       onChange={(e) => setFormProduct({ ...formProduct, Kodeproduk: e.target.value })}
-                      className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder-[#838383] transition-colors"
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 placeholder-slate-400 transition-colors"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Name of the Product</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Name of the Product</label>
                     <input
                       type="text"
                       placeholder="TTPD Vinyl"
                       value={formProduct.Namaproduk}
                       onChange={(e) => setFormProduct({ ...formProduct, Namaproduk: e.target.value })}
-                      className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder-[#838383] transition-colors"
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 placeholder-slate-400 transition-colors"
                       required
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Category (Era/Album)</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category (Era/Album)</label>
                     <select
                       value={formProduct.Kategori}
                       onChange={(e) => setFormProduct({ ...formProduct, Kategori: e.target.value })}
-                      className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] transition-colors"
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors"
                       required
                     >
                       <option value="" disabled>Pilih Era / Album</option>
@@ -565,60 +571,59 @@ function App() {
                       ))}
                     </select>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-semibold text-[#1a1a1a]">Price</label>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Price</label>
                       <input
                         type="number"
                         placeholder="150000"
                         value={formProduct.Harga}
                         onChange={(e) => setFormProduct({ ...formProduct, Harga: e.target.value })}
-                        className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder-[#838383] transition-colors"
+                        className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 placeholder-slate-400 transition-colors"
                         required
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-[#1a1a1a]">Stock</label>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Stock</label>
                       <input
                         type="number"
                         placeholder="10"
                         value={formProduct.Stok}
                         onChange={(e) => setFormProduct({ ...formProduct, Stok: e.target.value })}
-                        className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder-[#838383] transition-colors"
+                        className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 placeholder-slate-400 transition-colors"
                         required
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Description</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
                     <textarea
                       placeholder="It's a good thing, to buy, etc"
                       value={formProduct.Deskripsi}
                       onChange={(e) => setFormProduct({ ...formProduct, Deskripsi: e.target.value })}
-                      className="w-full p-2 sm:p-2.5 mt-1 text-xs sm:text-sm bg-white border border-[#b2b2b2] text-[#1a1a1a] rounded-lg sm:rounded-xl focus:outline-none focus:border-[#000000] focus:ring-1 focus:ring-[#000000] placeholder-[#838383] min-h-[80px] sm:min-h-[100px] resize-y transition-colors"
+                      className="w-full p-2.5 mt-1 text-sm bg-white border border-slate-200 text-slate-700 rounded-sm focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 placeholder-slate-400 min-h-[100px] resize-y transition-colors"
                       required
                     />
                   </div>
 
-                  {/* Upload Picture - dengan preview */}
+                  {/* Upload Picture - dengan preview, style konsisten AdminOrders */}
                   <div>
-                    <label className="text-xs font-semibold text-[#1a1a1a]">Upload Picture</label>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Upload Picture</label>
                     <input
                       type="file"
                       multiple
                       accept="image/*"
                       ref={inputFileRef}
                       onChange={(e) => setSelectedFiles(Array.from(e.target.files))}
-                      className="w-full text-xs mt-1 file:mr-2 sm:file:mr-4 file:py-2 file:px-3 sm:file:px-4 file:rounded-lg sm:file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#1a1a1a] file:text-[#b2b2b2] hover:file:bg-[#000000] file:transition-colors file:cursor-pointer text-[#1a1a1a]"
+                      className="w-full text-sm mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-wider file:bg-slate-800 file:text-white hover:file:bg-black file:transition-colors file:cursor-pointer text-slate-500"
                     />
 
-                    {/* Preview Gambar yang Dipilih */}
                     {selectedFiles.length > 0 ? (
-                      <div className="mt-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
+                      <div className="mt-3 bg-slate-50 p-2 border border-slate-200 rounded-sm grid grid-cols-3 gap-2">
                         {selectedFiles.map((file, idx) => (
                           <div
                             key={idx}
-                            className="relative aspect-square bg-white rounded-lg sm:rounded-xl overflow-hidden border border-[#545454]/30 shadow-sm group"
+                            className="relative aspect-square bg-white rounded-sm overflow-hidden border border-slate-200 group"
                           >
                             <img
                               src={URL.createObjectURL(file)}
@@ -627,9 +632,7 @@ function App() {
                             />
                             <button
                               type="button"
-                              onClick={() => {
-                                setSelectedFiles((prev) => prev.filter((_, i) => i !== idx));
-                              }}
+                              onClick={() => setSelectedFiles((prev) => prev.filter((_, i) => i !== idx))}
                               className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-black/60 hover:bg-black/90 text-white text-xs rounded-full transition-colors opacity-0 group-hover:opacity-100"
                               aria-label="Remove image"
                             >
@@ -639,7 +642,7 @@ function App() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[10px] sm:text-xs text-[#545454] mt-1.5">
+                      <p className="text-xs text-slate-400 italic mt-1.5">
                         Belum ada gambar dipilih. Bisa pilih lebih dari 1 file sekaligus.
                       </p>
                     )}
@@ -647,51 +650,51 @@ function App() {
 
                   <button
                     type="submit"
-                    className="w-full py-2 sm:py-2.5 text-white font-semibold text-xs sm:text-sm rounded-lg sm:rounded-xl transition-all mt-2 bg-[#1a1a1a] hover:bg-[#000000] active:scale-95 shadow-md"
+                    className="w-full py-2.5 text-white font-semibold text-sm rounded-sm transition-all mt-2 bg-slate-800 hover:bg-black active:scale-95 shadow-sm"
                   >
                     Save to Database
                   </button>
                 </form>
               </div>
 
-              {/* Product List - Responsive Table */}
-              <div className="lg:col-span-2 bg-white p-4 sm:p-5 md:p-6 rounded-xl sm:rounded-2xl border border-[#b2b2b2]/40 shadow-md w-full">
-                <h3 className="text-base sm:text-lg font-bold text-[#1a1a1a] mb-4 font-folklore">Product List</h3>
-                <div className="overflow-x-auto -mx-4 sm:mx-0 sm:overflow-visible">
-                  <table className="w-full text-left text-xs sm:text-sm text-[#545454] min-w-[500px] sm:min-w-full">
-                    <thead className="bg-[#b2b2b2]/20 text-[#1a1a1a] text-xs uppercase font-bold sticky top-0 z-10">
-                      <tr>
-                        <th className="p-2 sm:p-3">Picture</th>
-                        <th className="p-2 sm:p-3">Name</th>
-                        <th className="p-2 sm:p-3">Price</th>
-                        <th className="p-2 sm:p-3">Stock</th>
-                        <th className="p-2 sm:p-3 text-center">Action</th>
+              {/* Product List */}
+              <div className="lg:col-span-2 bg-white rounded-sm border border-slate-200 shadow-sm overflow-hidden">
+                <h3 className="text-lg font-bold text-slate-800 p-6 pb-0">Product List</h3>
+                <div className="overflow-x-auto p-6">
+                  <table className="w-full text-left border-collapse text-sm min-w-[500px]">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4">Picture</th>
+                        <th className="p-4">Name</th>
+                        <th className="p-4">Price</th>
+                        <th className="p-4">Stock</th>
+                        <th className="p-4 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#b2b2b2]/30">
+                    <tbody className="divide-y divide-slate-100">
                       {products.map((p) => (
-                        <tr key={p.ID} className="hover:bg-[#b2b2b2]/10 transition-colors">
-                          <td className="p-2 sm:p-3">
+                        <tr key={p.ID}>
+                          <td className="py-4 px-4">
                             <img
                               src={p.Gambar ? p.Gambar.split(',')[0] : 'https://via.placeholder.com/50'}
                               alt={p.Namaproduk}
-                              className="w-8 h-8 sm:w-10 sm:h-10 object-contain bg-[#b2b2b2]/20 rounded"
+                              className="w-10 h-10 object-contain bg-slate-50 border border-slate-200 rounded-sm"
                             />
                           </td>
-                          <td className="p-2 sm:p-3 font-medium text-[#000000] text-xs sm:text-sm line-clamp-2">{p.Namaproduk}</td>
-                          <td className="p-2 sm:p-3 text-[#1a1a1a] text-xs sm:text-sm whitespace-nowrap">Rp {Number(p.Harga).toLocaleString('id-ID')}</td>
-                          <td className="p-2 sm:p-3 font-semibold text-[#1a1a1a] text-xs sm:text-sm">{p.Stok}</td>
-                          <td className="p-2 sm:p-3">
-                            <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap">
+                          <td className="py-4 px-4 font-medium text-slate-700 line-clamp-2">{p.Namaproduk}</td>
+                          <td className="py-4 px-4 font-bold text-slate-800 whitespace-nowrap">Rp {Number(p.Harga).toLocaleString('id-ID')}</td>
+                          <td className="py-4 px-4 text-slate-600 font-medium">{p.Stok}</td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center justify-center gap-2 flex-wrap">
                               <button
                                 onClick={() => handleEditClick(p)}
-                                className="px-2 sm:px-3 py-1 text-xs font-bold text-white bg-[#545454] rounded hover:bg-[#1a1a1a] transition-colors active:scale-95 flex-shrink-0"
+                                className="px-3 py-1 text-xs font-bold text-indigo-600 hover:underline transition-colors"
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => handleDeleteProduct(p.ID)}
-                                className="px-2 sm:px-3 py-1 text-xs font-bold text-white bg-[#838383] rounded hover:bg-[#545454] transition-colors active:scale-95 flex-shrink-0"
+                                className="px-3 py-1 text-xs font-bold text-red-500 hover:underline transition-colors"
                               >
                                 Delete
                               </button>
@@ -708,12 +711,12 @@ function App() {
 
           {/* Payments Tab */}
           {adminTab === 'payments' && (
-            <div className="w-full">
+            <div className="w-full -mx-6 md:-mx-10">
               <AdminOrders />
             </div>
           )}
 
-          {/* Albums Tab (BARU) */}
+          {/* Albums Tab */}
           {adminTab === 'albums' && (
             <div className="w-full">
               <AddAlbumForm onSuccess={() => toast.success('Album baru berhasil ditambahkan!')} />
