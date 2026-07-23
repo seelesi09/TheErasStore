@@ -43,7 +43,7 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                     The Eras Store
                 </div>
 
-                {/* Desktop Navigation */}
+                {/* Desktop Navigation - HANYA menu, tidak ada username di sini */}
                 <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white/60">
                     {navItems.map((item) => (
                         <button
@@ -56,15 +56,20 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                             {item.label}
                         </button>
                     ))}
-
-                    {user && (
-                        <span className="text-xs bg-white/10 text-white/80 px-2.5 py-1 rounded-md tracking-wider font-semibold whitespace-nowrap">
-                            {user.Username || user.username || "User"}
-                        </span>
-                    )}
                 </div>
 
+                {/* Area kanan: Username (non-clickable) + Logout/Login + Hamburger */}
                 <div className="flex items-center gap-4">
+                    {/* Nama akun - dipisah dari menu, tidak terlihat seperti tombol */}
+                    {user && (
+                        <div className="hidden md:flex items-center gap-2 text-xs text-white/50 border-r border-white/10 pr-4">
+                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full flex-shrink-0" />
+                            <span className="font-medium whitespace-nowrap">
+                                {user.Username || user.username || "User"}
+                            </span>
+                        </div>
+                    )}
+
                     {user ? (
                         <button
                             onClick={handleLogout}
@@ -105,12 +110,26 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                 </div>
             </nav>
 
+            {/* Mobile Menu */}
             <div
                 className={`fixed top-16 left-0 right-0 bg-black border-b border-white/5 z-40 md:hidden transition-all duration-300 overflow-hidden font-folklore ${
                     isMobileMenuOpen ? 'max-h-screen' : 'max-h-0'
                 }`}
             >
                 <div className="flex flex-col py-4 px-4 gap-2">
+                    {/* Info akun ditaruh PALING ATAS di mobile menu, dipisah dari nav items */}
+                    {user && (
+                        <div className="flex items-center gap-2 px-4 py-3 bg-white/5 rounded-md mb-2">
+                            <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0" />
+                            <div>
+                                <span className="text-[10px] text-white/40 block">Logged in as</span>
+                                <p className="text-sm font-semibold text-white leading-tight">
+                                    {user.Username || user.username || "User"}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     {navItems.map((item) => (
                         <button
                             key={item.view}
@@ -124,15 +143,6 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
                             {item.label}
                         </button>
                     ))}
-
-                    {user && (
-                        <div className="px-4 py-3 border-t border-white/10 mt-2">
-                            <span className="text-xs text-white/60">Logged in as</span>
-                            <p className="text-sm font-semibold text-white">
-                                {user.Username || user.username || "User"}
-                            </p>
-                        </div>
-                    )}
                 </div>
             </div>
         </>
