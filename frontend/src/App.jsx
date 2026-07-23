@@ -728,7 +728,7 @@ function App() {
 
           {/* Payments Tab */}
           {adminTab === 'payments' && (
-            <div className="w-full -mx-6 md:-mx-10">
+            <div className="w-full">
               <AdminOrders />
             </div>
           )}
