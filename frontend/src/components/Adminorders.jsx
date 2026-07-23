@@ -71,7 +71,7 @@ function AdminOrders() {
                     <thead>
                         <tr className="bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-500 uppercase tracking-wider">
                             <th className="p-4">Order ID</th>
-                            <th className="p-4">Customer</th>
+                            <th className="p-4 text-1xl">Customer</th>
                             <th className="p-4">Date Placed</th>
                             <th className="p-4">Shipping Address</th>
                             <th className="p-4">Total Price</th>
