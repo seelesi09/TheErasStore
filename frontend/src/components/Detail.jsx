@@ -25,10 +25,10 @@ export default function Detail({ isOpen, onClose, productData, onBuyNow }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-4 md:p-6 overflow-y-auto">
             {/* Modal Card dengan Scroll Internal untuk Layar Kecil */}
             <div className="bg-white/95 backdrop-blur-md p-5 sm:p-6 md:p-8 rounded-2xl border border-white/20 shadow-2xl w-full max-w-sm sm:max-w-xl md:max-w-3xl relative animate-in fade-in zoom-in-95 duration-200 text-slate-800 my-auto max-h-[90vh] overflow-y-auto custom-scrollbar">
-                
+
                 {/* Tombol Close */}
-                <button 
-                    onClick={onClose} 
+                <button
+                    onClick={onClose}
                     className="absolute top-3 right-3 sm:top-4 sm:right-4 text-[#1a1a1a] hover:opacity-70 transition-opacity z-10 p-1 bg-white/80 rounded-full shadow-sm"
                     aria-label="Close modal"
                 >
@@ -37,13 +37,13 @@ export default function Detail({ isOpen, onClose, productData, onBuyNow }) {
 
                 {/* Grid Responsif: 1 Kolom di HP, 2 Kolom di Tablet & Laptop */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 pt-2 items-start">
-                    
+
                     {/* Gambar Produk */}
                     <div className="w-full aspect-square max-h-[280px] sm:max-h-[350px] md:max-h-none bg-slate-100 rounded-xl sm:rounded-2xl overflow-hidden shadow-inner border border-slate-200 flex items-center justify-center mx-auto">
-                        <img 
-                            src={mainImage} 
-                            alt={namaProduk} 
-                            className="w-full h-full object-cover object-center" 
+                        <img
+                            src={mainImage}
+                            alt={namaProduk}
+                            className="w-full h-full object-cover object-center"
                         />
                     </div>
 
@@ -55,17 +55,17 @@ export default function Detail({ isOpen, onClose, productData, onBuyNow }) {
                                     {kategoriProduk}
                                 </span>
                             )}
-                            
+
                             <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2 font-folklore leading-tight">
                                 {namaProduk}
                             </h2>
-                            
+
                             <p className="text-xl sm:text-2xl font-black text-slate-800 mt-1 sm:mt-2 font-folklore">
                                 Rp {hargaProduk.toLocaleString('id-ID')}
                             </p>
-                            
+
                             <div className="h-[1px] bg-slate-300/50 my-2 sm:my-3" />
-                            
+
                             <div className="space-y-1">
                                 <h4 className="text-[10px] sm:text-xs font-bold text-slate-400 tracking-wider uppercase">Product Description</h4>
                                 <div className="text-xs sm:text-sm text-slate-600 leading-relaxed max-h-[120px] sm:max-h-[160px] overflow-y-auto pr-2 custom-scrollbar">
@@ -81,15 +81,17 @@ export default function Detail({ isOpen, onClose, productData, onBuyNow }) {
                                 <span className="font-bold text-slate-900">{stokProduk} pcs</span>
                             </div>
 
-                            <button
-                                onClick={() => onBuyNow(productData)}
-                                className="w-full bg-[#1a1a1a] hover:bg-black active:scale-[0.98] text-white font-semibold py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                </svg>
-                                Buy Now
-                            </button>
+                            {user?.role !== 'admin' && (
+                                <button
+                                    onClick={() => onBuyNow(productData)}
+                                    className="w-full bg-[#1a1a1a] hover:bg-black active:scale-[0.98] text-white font-semibold py-2.5 sm:py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                    Buy Now
+                                </button>
+                            )}
                         </div>
                     </div>
 
