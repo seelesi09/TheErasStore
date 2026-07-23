@@ -289,7 +289,7 @@ function App() {
       setAuthView('login');
       return;
     }
-    if (user.Role === 'admin'){
+    if (user.Role === 'admin') {
       toast.error('Admin(s) are restricted to checkout product(s)')
       return;
     }
@@ -409,17 +409,17 @@ function App() {
                               namaProduk={product.Namaproduk}
                             />
                           </div>
-                        {user?.Role !== 'admin' && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRealAddToCart(product.ID);
-                            }}
-                            className="w-full bg-[#545454] hover:bg-[#838383] active:bg-[#3a3a3a] text-white font-folklore font-semibold py-2 sm:py-2.5 md:py-3 rounded-sm transition-all text-xs sm:text-sm active:scale-95"
-                          >
-                            Add To Cart
-                          </button>
-                        )}
+                          {user?.Role !== 'admin' && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRealAddToCart(product.ID);
+                              }}
+                              className="w-full bg-[#545454] hover:bg-[#838383] active:bg-[#3a3a3a] text-white font-folklore font-semibold py-2 sm:py-2.5 md:py-3 rounded-sm transition-all text-xs sm:text-sm active:scale-95"
+                            >
+                              Add To Cart
+                            </button>
+                          )}
                         </div>
 
                         <div className="mt-3 sm:mt-4 md:mt-6 px-1">
@@ -450,12 +450,16 @@ function App() {
 
       {/* ========== CART VIEW ========== */}
       {currentView === 'cart' && (
-        user?.Role === 'admin' (
-        <Cart
-          user={user}
-          setCurrentView={setCurrentView}
-          onCheckoutSuccess={handleGoToPayment}
-        />
+        user?.Role === 'admin' ? (
+          <div className="text-center py-20 font-folklore text-slate-500">
+            Admin tidak memiliki akses ke halaman keranjang/checkout.
+          </div>
+        ) : (
+          <Cart
+            user={user}
+            setCurrentView={setCurrentView}
+            onCheckoutSuccess={handleGoToPayment}
+          />
         )
       )}
 
