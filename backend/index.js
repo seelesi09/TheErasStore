@@ -636,6 +636,32 @@ ORDER BY o.Tanggal_Order DESC;
     });
 });
 
+//endpoint get satu order detail (admin)
+app.get('/api/admin/orders/:orderId/detail', (req, res) => {
+    const { orderId } = req.params;
+
+    const query = `
+        SELECT 
+            oi.ID AS Item_ID,
+            oi.Produk_ID,
+            oi.Qty,
+            oi.Harga,
+            p.Namaproduk,
+            p.Gambar
+        FROM order_items oi
+        JOIN produk p ON oi.Produk_ID = p.ID
+        WHERE oi.Order_ID = ?;
+    `;
+
+    db.query(query, [orderId], (err, result) => {
+        if (err) {
+            console.error('Error fetching order detail items: ', err);
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(result);
+    });
+});
+
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server berjalan di https://theerasstore-production.up.railway.app:${PORT}`);
