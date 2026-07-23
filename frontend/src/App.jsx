@@ -763,6 +763,7 @@ function App() {
           setSelectedProductToDetail(null);
         }}
         productData={selectedProductToDetail}
+        user={user}
         onBuyNow={(products) => {
           handleRealAddToCart(products.ID);
         }}
