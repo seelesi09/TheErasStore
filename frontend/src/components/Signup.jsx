@@ -91,6 +91,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
                     username: '',
                     password: '',
                 });
+                onSwitchToLogin()
 
                 if (onSignupSuccess) {
                     onSignupSuccess(response.data.user);
