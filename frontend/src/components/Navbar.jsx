@@ -60,7 +60,7 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
         </div>
 
         {/* Area kanan: Username + Logout/Login + Hamburger */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
             {user && (
                 <div className="hidden md:flex items-center gap-2 text-xs text-white/50 border-r border-white/10 pr-4">
                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full flex-shrink-0" />
