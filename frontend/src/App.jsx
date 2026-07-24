@@ -344,27 +344,36 @@ function App() {
         <>
           {/* Hero Section - Fully Responsive */}
           <section className="relative w-full min-h-[400px] sm:min-h-[450px] md:min-h-[550px] lg:min-h-[600px] xl:min-h-[700px] flex items-center bg-black py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 md:px-8 lg:px-12 overflow-hidden">
-            <img
-              src={BgFolklore}
-              alt="The Eras Visual"
-              className="absolute inset-0 w-full h-full object-cover opacity-40 sm:opacity-50 object-center pointer-events-none"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none" />
+  {/* Video Background - looping dan muted */}
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="absolute inset-0 w-full h-full object-cover opacity-40 sm:opacity-50 pointer-events-none"
+  >
+    <source src="https://link-ke-video-kamu/video.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-            <div className="relative w-full max-w-[1600px] mx-auto z-10 text-left px-2 sm:px-4 space-y-4 sm:space-y-6 md:space-y-8">
-              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-folklore text-white/80 leading-tight">
-                <DecryptedText
-                  text='Find Your Best'
-                  idleDelay={1000}
-                />
-                <span className="text-white block mt-2 sm:mt-3 md:mt-4 drop-shadow-lg">Era's</span>
-              </h1>
-              <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl text-slate-200 leading-relaxed font-folklore">
-                Hi <strong className="text-white">{user?.Username || "User"}</strong>!
-                Welcome to The Eras Store, we hope you can find your Era's!
-              </p>
-            </div>
-          </section>
+  {/* Gradient overlay untuk shadow effect */}
+  <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+  {/* Content tetap sama */}
+  <div className="relative w-full max-w-[1600px] mx-auto z-10 text-left px-2 sm:px-4 space-y-4 sm:space-y-6 md:space-y-8">
+    <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-folklore text-white/80 leading-tight">
+      <DecryptedText
+        text='Find Your Best'
+        idleDelay={1000}
+      />
+      <span className="text-white block mt-2 sm:mt-3 md:mt-4 drop-shadow-lg">Era's</span>
+    </h1>
+    <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl text-slate-200 leading-relaxed font-folklore">
+      Hi <strong className="text-white">{user?.Username || "User"}</strong>!
+      Welcome to The Eras Store, we hope you can find your Era's!
+    </p>
+  </div>
+</section>
 
           <AboutUs id='about' />
 
