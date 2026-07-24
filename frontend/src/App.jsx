@@ -19,6 +19,8 @@ import Album from './components/Album';
 import AddAlbumForm from './components/AddAlbumForm';
 import { staticEras } from './data/staticEras';
 import BgFolklore from './assets/picture/dashboard-folklore (1).jpg';
+import TaylorRunning from './assets/picture/taylor_running.mp4';
+
 
 // Custom toast wrapper using SweetAlert2
 const toast = {
@@ -352,7 +354,7 @@ function App() {
     playsInline
     className="absolute inset-0 w-full h-full object-cover opacity-40 sm:opacity-50 pointer-events-none"
   >
-    <source src="https://link-ke-video-kamu/video.mp4" type="video/mp4" />
+    <source src={TaylorRunning} type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
