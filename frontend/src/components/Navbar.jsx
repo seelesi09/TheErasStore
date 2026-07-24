@@ -45,7 +45,7 @@ function Navbar({ user, currentView, setCurrentView, handleLogout, onOpenLogin }
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white/60">
+        <div className="hidden md:flex items-center gap-10 text-sm font-medium text-white/60 flex-1">
             {navItems.map((item) => (
                 <button
                     key={item.view}
