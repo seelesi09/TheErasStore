@@ -119,7 +119,7 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center px-4 font-folklore">
+        <div className="h-auto bg-[#0d0d0d] flex items-center justify-center px-4 font-folklore">
             <div className="w-full max-w-md">
                 {/* Card Form */}
                 <div className="bg-black/40 backdrop-blur-sm border border-white/5 rounded-2xl p-8 shadow-2xl">
