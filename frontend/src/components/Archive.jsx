@@ -223,7 +223,7 @@ function Archive({ products = [], handleRealAddToCart, setCurrentView }) {
                   <div className={dividerClassName} style={dividerStyle}></div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
                   {eraProducts.map((product) => {
                     const nama = product.Namaproduk || product.namaproduk || product.Nama || product.nama;
                     const harga = product.Harga || product.harga;
