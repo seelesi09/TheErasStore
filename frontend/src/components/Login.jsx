@@ -101,15 +101,14 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
                 Username
               </label>
               <input
-                id="username"
-                type="text"
-                placeholder="Input Your Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={loading}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-            </div>
+  id="username"
+  type="text"
+  placeholder="Input Your Username"
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+  disabled={loading}
+  className="w-full px-4 py-4 text-base bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+/>
 
             <div className="group">
               <label htmlFor="password" className="block text-xs font-semibold text-gray-300 mb-2 uppercase tracking-wide">
@@ -118,14 +117,14 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
 
               <div className="relative flex items-center">
                 <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Input Your Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  className="w-full px-4 py-3 pr-11 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
-                />
+  id="password"
+  type={showPassword ? 'text' : 'password'}
+  placeholder="Input Your Password"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  disabled={loading}
+  className="w-full px-4 py-4 pr-11 text-base bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+/>
 
                 <button
                   type="button"
