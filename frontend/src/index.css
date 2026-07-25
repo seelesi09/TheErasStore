@@ -1,13 +1,35 @@
 @import "tailwindcss";
 
+@supports (min-height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
+html {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+body {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  min-height: 100vh;
+}
+
 @font-face {
   font-family: 'folklore';
   src: url('./assets/fonts/FePIit2.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-  size-adjust: 90%;
 }
+
 
 @theme {
   --font-folklore: 'folklore', sans-serif;
