@@ -95,3 +95,7 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+input, button, textarea, select {
+  position: relative;
+  z-index: 10;
+}
