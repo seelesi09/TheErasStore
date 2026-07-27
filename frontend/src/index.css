@@ -28,8 +28,11 @@ body {
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+  size-adjust: 85%;
+  ascent-override: 90%;
+  descent-override: 20%;
+  line-gap-override: 0%;
 }
-
 
 @theme {
   --font-folklore: 'folklore', sans-serif;
